@@ -1,0 +1,36 @@
+
+Evaluation of absolute alignment error. 
+ done  for  begin ts and end ts of each token: 
+ 
+ detected file format :  mlf format of htk
+ annotation file format: TextGrid of Praat 
+ 
+Algorithm does not try to map token identities between detected result and annotation, but proceeds successively one-by-one  
+ 
+---------------------------------------- 
+EXAMPLE: if result is:
+ 
+startTs endTs phonemeOrWord
+0.0		1.11	sil
+1.11	2.41	usagi
+2.41	2.90	usagi
+2.90	3.38	sp
+3.38	4.15	nani
+
+and <>.TextGrid is 
+ts 	usagi usagi 
+ts 	nani
+
+-----
+ ts taken into account are: 
+1.11 2.90 usagi usagi 
+and 
+3.38 4.15	nani
+
+
+To change extensions edit variables in WordLevelEvaluator 
+ANNOTATION_EXT = '.TextGrid'
+DETECTED_EXT = '.dtwDurationAligned'
+
+TODO: change names in module evaluation.WordLevelEvaluator.evalAlignmentError to be coherent. 
+For example detectedWordList 
