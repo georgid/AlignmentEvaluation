@@ -10,6 +10,7 @@ This is similar to proposed by shriberg on sentence boundary detection.
 import os
 import sys
 import numpy
+from PraatVisualiser import mlf2PhonemesAndTsList, mlf2WordAndTsList
 
 
 # this allows path to packages to be resolved correctly (on import) from outside of eclipse 
@@ -22,8 +23,7 @@ sys.path.append(pathUtils )
 
 
 from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList
-from Utilz import  mlf2WordAndTsList, \
-    mlf2PhonemesAndTsList, getMeanAndStDevError
+from Utilz import getMeanAndStDevError
 
 
 ANNOTATION_EXT = '.TextGrid'
