@@ -10,7 +10,8 @@ This is similar to proposed by shriberg on sentence boundary detection.
 import os
 import sys
 import numpy
-from PraatVisualiser import mlf2PhonemesAndTsList, mlf2WordAndTsList
+from PraatVisualiser import mlf2PhonemesAndTsList, mlf2WordAndTsList,\
+    openAlignmentInPraat
 
 
 # this allows path to packages to be resolved correctly (on import) from outside of eclipse 
@@ -65,7 +66,14 @@ def wordsList2avrgTxt(annotationWordList, detectedWordList):
     return
 
 def evalAlignmentError(annotationURI, detectedURI, whichLevel=2 ):
-    '''reads detected from htk mlf'''
+    '''reads detected from htk mlf
+    @param detectedURI: URI of htk-mlf format
+    @param annotationURI: URI of Praat annotaiton textgrid. 
+    @param whichLevel, 0- phonemeLevel, 1 -wordLevel,  2 - phraseLevel. The level at which to compare phrases 
+    reads only the layer from with name correspondingly phonemes, words or phrases
+
+    
+    '''
     detectedWordList = loadDetectedTokenListFromMlf( detectedURI, whichLevel=2 )
     evalErrors = _evalAlignmentError(annotationURI, detectedWordList, whichLevel )
     return evalErrors
@@ -82,82 +90,85 @@ def loadDetectedTokenListFromMlf( detectedURI, whichLevel=2 ):
     return detectedWordList
         
 
-def _evalAlignmentError(annotationURI, detectedWordList, whichLevel=2 ):
+def _evalAlignmentError(annotationURI, detectedTokenList, whichLevel=2 ):
     '''
 Calculate alignment errors. Does not check token identities, but proceeds successively one-by-one  
-Make sure detected tokens (wihtout counting sp, sil ) are same number as annotated tokens 
+Make sure number of detected tokens (wihtout counting sp, sil ) is same as number of annotated tokens 
+
+    @param detectedURI: a list of triples: (startTs, endTs, wordID) 
+    @param annotationURI: URI of Praat annotaiton textgrid. 
+    @param whichLevel, 0- phonemeLevel, 1 -wordLevel,  2 - phraseLevel. The level at which to compare phrases 
+    reads only the layer from with name correspondingly phonemes, words or phrases
+    
+    token: could be phoeneme (consists of one subtoken -phoneme itself), word (consists of one subtoken -word itself) or phrase (consist of subtokens words ) 
 
 TODO: eval performance of end timest. only and compare with begin ts. 
-@param whichLevel, 0- phonemeLevel, 1 -wordLevel,  2 - phraseLevel
+
     '''
     alignmentErrors = []
     
-    
-    # remove deteted tokens NOISE, sil, sp entries from  detectedWordList
-    detectedWordListNoPauses = []   #result 
-    for detectedTsAndWrd in detectedWordList:
-        if detectedTsAndWrd[2] != 'sp' and detectedTsAndWrd[2] != 'sil' and detectedTsAndWrd[2] != 'NOISE':
-            detectedWordListNoPauses.append(detectedTsAndWrd)
+        ######################  
+    # prepare list of detected tokens. remove detected tokens NOISE, sil, sp entries from  detectedTokenList
+    detectedTokenListNoPauses = []   #result 
+    for detectedTsAndToken in detectedTokenList:
+        if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE':
+            detectedTokenListNoPauses.append(detectedTsAndToken)
 
     ######################  
-    # prepare list of phrases from ANNOTATION:
+    # prepare list of phrases from ANNOTATIO. remove empy annotaion tokens 
     
-    annotationPhraseListA = TextGrid2WordList(annotationURI, whichLevel)     
+    annotationTokenListA = TextGrid2WordList(annotationURI, whichLevel)     
     
-    annotationPhraseListNoPauses = []
-    for tsAndPhrase in annotationPhraseListA:
-        if tsAndPhrase[2] != "" and not(tsAndPhrase[2].isspace()): # skip empty phrases
-                annotationPhraseListNoPauses.append(tsAndPhrase)
+    annotationTokenListNoPauses = []
+    for annoTsAndToken in annotationTokenListA:
+        if annoTsAndToken[2] != "" and not(annoTsAndToken[2].isspace()): # skip empty phrases
+                annotationTokenListNoPauses.append(annoTsAndToken)
     
-    if len(annotationPhraseListNoPauses) == 0:
+    if len(annotationTokenListNoPauses) == 0:
         sys.exit(annotationURI + ' is empty!')
     
     
-    if len(detectedWordListNoPauses) == 0:
+    if len(detectedTokenListNoPauses) == 0:
         sys.exit(' detected wotd list is empty!')
+      
     
-    # TODO: The whole evaluation, not but numWords, but by word id. ISSUE: 19
-  
-    
-    # find start words of annotationPhraseListNoPauses
+    # loop in tokens of annotation
     currentWordNumber = 0
-    for tsAndPhrase in annotationPhraseListNoPauses:
+    for annoTsAndToken in annotationTokenListNoPauses:
        
-        tsAndPhrase[2] = tsAndPhrase[2].strip()
-        words = tsAndPhrase[2].split(" ")
-        numWordsInPhrase = len(words)
+        annoTsAndToken[2] = annoTsAndToken[2].strip()
+        subtokens = annoTsAndToken[2].split(" ")
+        numWordsInPhrase = len(subtokens)
         
         if numWordsInPhrase == 0:
-            sys.exit('phrase with no words in annotation file!')
+            sys.exit('token with no sutokens in annotation file!')
         
-        if  currentWordNumber + 1 > len(detectedWordListNoPauses):
+        if  currentWordNumber + 1 > len(detectedTokenListNoPauses):
             sys.exit('more tokens (words/phrases/phonemes) detected than in annotation. No evaluation possible')
             
-        currTsandWord = detectedWordListNoPauses[currentWordNumber]
+        detectedTsAndToken = detectedTokenListNoPauses[currentWordNumber]
         
-        # TODO: refactor:  repeat instead of reapeating code 
-        # calc difference phrase begin Ts
-        annotatedPhraseBEginTs = tsAndPhrase[0]
-        detectedPhraseBeginTs = currTsandWord[0]
+        # calc difference phrase begin Ts (0) and endTs (1)
+        for i in (0,1):
+            annotatedTs = annoTsAndToken[i]
+            detectedTs = detectedTsAndToken[i]
+
+            currAlignmentError = calcError(annotatedTs, detectedTs)
+            alignmentErrors.append(currAlignmentError)
         
-        currAlignmentError = calcError(annotatedPhraseBEginTs, detectedPhraseBeginTs)
-        alignmentErrors.append(currAlignmentError)
         
-        # calc difference phrase end Ts
-        annotatedPhraseEndTs = tsAndPhrase[1]
-        detectedPhraseEndTs = currTsandWord[1]
         
-        currAlignmentError = calcError(annotatedPhraseEndTs, detectedPhraseEndTs)
-        alignmentErrors.append(currAlignmentError)
-        
-        #### proceed as many words in annotation as         
+        #### UPDATE: proceed in detection the number of subtokens in current token          
         currentWordNumber +=numWordsInPhrase
                 
     return  alignmentErrors
         
 
-def calcError(annotatedPhraseBEginTs, detectedPhraseBeginTs):
-    currAlignmentError = float(annotatedPhraseBEginTs) - float(detectedPhraseBeginTs)
+def calcError(annotatedTokenTs, detectedTokenTs):
+    '''
+    abs error btw a token form anno and detected 
+    '''
+    currAlignmentError = float(annotatedTokenTs) - float(detectedTokenTs)
     currAlignmentError = numpy.round(currAlignmentError, decimals=2)
     return currAlignmentError      
     
@@ -167,12 +178,15 @@ def evalOneFile(argv):
         ''' Main utility function
         ''' 
        
-        if len(argv) != 4:
-            print ("usage: {} <URI_annotation> <URI_detected> <evalLevel>".format(argv[0]) )
+        if len(argv) != 5:
+            print ("usage: {} <URI_annotation> <URI_detected> <evalLevel> <URI_audio>".format(argv[0]) )
             sys.exit();
              
-        
-        alignmentErrors  = evalAlignmentError(argv[1], argv[2], int(argv[3]))
+        annoURI = argv[1]
+        detectedURI = argv[2]
+        evalLevel = int(argv[3])
+        audio_URI = argv[4]
+        alignmentErrors  = evalAlignmentError(annoURI , detectedURI  , evalLevel)
         
         mean, stDev, median = getMeanAndStDevError(alignmentErrors)
         
@@ -182,7 +196,7 @@ def evalOneFile(argv):
         
         
          ### OPTIONAL : open detection and annotation in praat. can be provided on request
-#         openAlignmentInPraat(annotationURI, detectedURI, 0, audioURI)
+        openAlignmentInPraat(annoURI, detectedURI, 0, audio_URI)
         
         return mean, stDev,  median, alignmentErrors
     

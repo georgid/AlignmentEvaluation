@@ -10,8 +10,13 @@ import logging
 import shutil
 import subprocess
 
+# change path to where Praat is installed
 PATH_TO_PRAAT = '/Applications/Praat.app/Contents/MacOS/Praat'
-PATH_TO_PRAAT_SCRIPT= '/Users/joro/Documents/Phd/UPF/voxforge/myScripts/praat/loadAlignedResultAndTextGrid.rb'
+
+parentDir = os.path.abspath(os.path.dirname(os.path.realpath(__file__ ) ) )
+PATH_TO_PRAAT_SCRIPT= os.path.join(parentDir, 'loadAlignedResultAndTextGrid.rb')
+
+print PATH_TO_PRAAT_SCRIPT
 
 HTK_MLF_ALIGNED_SUFFIX= ".htkAlignedMlf"
  
@@ -21,7 +26,7 @@ PHONEME_ALIGNED_SUFFIX= ".phonemeAligned"
 
 PHRASE_ANNOTATION_EXT = '.TextGrid'
 
-
+# utils to do reading and writing into text files  
 parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(sys.argv[0]) ), os.path.pardir)) 
 pathUtils = os.path.join(parentDir, 'utilsLyrics')
 sys.path.append(pathUtils )
@@ -73,12 +78,13 @@ def mlf2PraatFormat( listTsAndPhonemes, timeShift, baseNameAudioFile, whichSuffi
 
     
     
-def openAlignmentInPraat2(detecteWordList,  wordAnnoURI, pathToAudioFile):
+def openAlignmentInPraat2(detectedTokenList,  wordAnnoURI, pathToAudioFile):
     '''
-    instead of file use python list: detectedWordList with ts
+    same as openAlignmentInPraat, but
+    instead of file with outputHTKPhoneAlignedURI use python list: @param detectedTokenList
     '''
     baseNameAudioFile = os.path.splitext(pathToAudioFile)[0]
-    wordAlignedfileName=  mlf2PraatFormat(detecteWordList, 0, baseNameAudioFile, WORD_ALIGNED_SUFFIX)
+    wordAlignedfileName=  mlf2PraatFormat(detectedTokenList, 0, baseNameAudioFile, WORD_ALIGNED_SUFFIX)
     _openAlignmentInPraat(wordAnnoURI,wordAlignedfileName, 0, pathToAudioFile)  
                     
 
@@ -99,11 +105,9 @@ def openAlignmentInPraat(wordAnnoURI, outputHTKPhoneAlignedURI, timeShift, pathT
     
     open Praat to visualize it 
     '''
+    
 def _openAlignmentInPraat(wordAnnoURI, wordAlignedfileName, timeShift, pathToAudioFile):
     
-    # prepare
-   
-
      
     ########### call praat script to add alignment as a new layer to existing annotation TextGrid
     alignedResultPath = os.path.dirname(wordAlignedfileName)

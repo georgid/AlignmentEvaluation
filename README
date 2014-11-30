@@ -5,14 +5,21 @@ NAME: AlignmentEvaluation
 
 DESCRIPTION 
 
-A tool for evaluation of absolute alignment error. 
-Done to evaluate results of a system for lyrics-2-audio alignment. Usable evaluation for any token-based alignment (e.g. if token is word, phrase, note, section )
-Considers    begin timestamp and end timestamp of each token: 
+A tool for evaluation of absolute alignment error of tokens.
+Done to evaluate results of a system for lyrics-2-audio alignment on different levels (a token could be phoneme, word or phrase - a group of words )
+Extendable to the evaluation for any token-based alignment (e.g. if token is word, phrase, note, section )
+Considers    begin timestamp and end timestamp of each token.
  
- detected file format :  mlf format of htk
- annotation file format: TextGrid of Praat 
+ detected file format :  mlf format of htk (can work with python tuples ditectly)
+ annotation file format: TextGrid of www.praat.org/ 
  
-Algorithm does not try to map token identities between detected result and annotation, but proceeds successively one-by-one  
+Algorithm is token-identities-agnostic, e.g. it does not try to match token-IDs between detected result and annotation, but proceeds successively one-by-one  
+
+Note that if a single boundary is detected between two tokens it is considered once as end of preceding annotation token  and beginning of following annotation token, which makes the metric rather strict
+
+As well a module to open autoamtically result in Praat is included!
+Enjoy!
+ 
  
 LICENSE:
 AlignmentEvaluation is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation (FSF), either version 3 of the License, or (at your option) any later version.
@@ -20,6 +27,13 @@ AlignmentEvaluation is free software: you can redistribute it and/or modify it u
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/
+
+
+BUILD INSTRUCTIONS:
+
+depends on 
+* utilsLyrics
+git clone https://github.com/georgid/utilsLyrics.git
 
 
 
@@ -46,6 +60,3 @@ and
 To change extensions edit variables in WordLevelEvaluator 
 ANNOTATION_EXT = '.TextGrid'
 DETECTED_EXT = '.dtwDurationAligned'
-
-TODO: change names in module evaluation.WordLevelEvaluator.evalAlignmentError to be coherent. 
-For example detectedWordList 
