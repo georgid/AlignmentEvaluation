@@ -8,7 +8,7 @@ DESCRIPTION
 A tool for evaluation of absolute alignment error of tokens.
 Done to evaluate results of a system for lyrics-2-audio alignment on different levels (a token could be phoneme, word or phrase - a group of words )
 Extendable to the evaluation for any token-based alignment (e.g. if token is word, phrase, note, section )
-Considers    begin timestamp and end timestamp of each token.
+Considers begin timestamp and end timestamp of each token.
  
  detected file format :  mlf format of htk (can work with python tuples ditectly)
  annotation file format: TextGrid of www.praat.org/ 
@@ -28,6 +28,10 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 
 You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/
 
+CITATION: 
+please cite 
+Dzhambazov, G., Senturk S., Serra X. - Automatic lyrics-to-audio alignment in classical Turkish music
+bibTex: http://mtg.upf.edu/biblio/export/bibtex/2965
 
 BUILD INSTRUCTIONS:
 
