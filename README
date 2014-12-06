@@ -10,8 +10,11 @@ Done to evaluate results of a system for lyrics-2-audio alignment on different l
 Extendable to the evaluation for any token-based alignment (e.g. if token is word, phrase, note, section )
 Considers begin timestamp and end timestamp of each token.
  
- detected file format :  mlf format of htk (can work with python tuples ditectly)
+ detected file format :  mlf format of htk 
  annotation file format: TextGrid of www.praat.org/ 
+ 
+ the detected result can be a text file of triples (begin timestamp, end timestamp, tokenID) : see method WordLevelEvaluator._evalAlignmentError() 
+ the annotation can be in www.sonicvisualiser.org (can be provided on request with code in sonicVisTextPhnDir2mlf.py)
  
 Algorithm is token-identities-agnostic, e.g. it does not try to match token-IDs between detected result and annotation, but proceeds successively one-by-one  
 
