@@ -11,7 +11,7 @@ import os
 import sys
 import numpy
 from PraatVisualiser import mlf2PhonemesAndTsList, mlf2WordAndTsList,\
-    openAlignmentInPraat
+    addAlignmentResultToTextGridFIle
 
 
 # this allows path to packages to be resolved correctly (on import) from outside of eclipse 
@@ -100,7 +100,7 @@ Make sure number of detected tokens (wihtout counting sp, sil ) is same as numbe
     @param whichLevel, 0- phonemeLevel, 1 -wordLevel,  2 - phraseLevel. The level at which to compare phrases 
     reads only the layer from with name correspondingly phonemes, words or phrases
     
-    token: could be phoeneme (consists of one subtoken -phoneme itself), word (consists of one subtoken -word itself) or phrase (consist of subtokens words ) 
+    token: could be phoneme (consists of one subtoken -phoneme itself), word (consists of one subtoken -word itself) or phrase (consist of subtokens words ) 
 
 TODO: eval performance of end timest. only and compare with begin ts. 
 
@@ -115,7 +115,7 @@ TODO: eval performance of end timest. only and compare with begin ts.
             detectedTokenListNoPauses.append(detectedTsAndToken)
 
     ######################  
-    # prepare list of phrases from ANNOTATIO. remove empy annotaion tokens 
+    # prepare list of phrases from ANNOTATION. remove empy annotaion tokens 
     
     annotationTokenListA = TextGrid2WordList(annotationURI, whichLevel)     
     
@@ -196,7 +196,7 @@ def evalOneFile(argv):
         
         
          ### OPTIONAL : open detection and annotation in praat. can be provided on request
-        openAlignmentInPraat(annoURI, detectedURI, 0, audio_URI)
+        addAlignmentResultToTextGridFIle(annoURI, detectedURI, 0, audio_URI)
         
         return mean, stDev,  median, alignmentErrors
     

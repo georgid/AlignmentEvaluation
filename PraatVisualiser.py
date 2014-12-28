@@ -78,24 +78,26 @@ def mlf2PraatFormat( listTsAndPhonemes, timeShift, baseNameAudioFile, whichSuffi
 
     
     
-def openAlignmentInPraat2(detectedTokenList,  wordAnnoURI, pathToAudioFile):
+def addAlignmentResultToTextGrid(detectedTokenList,  wordAnnoURI, pathToAudioFile):
     '''
-    same as openAlignmentInPraat, but
+    same as addAlignmentResultToTextGridFIle, but
     instead of file with outputHTKPhoneAlignedURI use python list: @param detectedTokenList
     '''
     baseNameAudioFile = os.path.splitext(pathToAudioFile)[0]
     wordAlignedfileName=  mlf2PraatFormat(detectedTokenList, 0, baseNameAudioFile, WORD_ALIGNED_SUFFIX)
-    _openAlignmentInPraat(wordAnnoURI,wordAlignedfileName, 0, pathToAudioFile)  
-                    
+    alignedResultPath, fileNameWordAnno = _addAlignmentResultToTextGrid(wordAnnoURI,wordAlignedfileName, 0)  
+    return alignedResultPath, fileNameWordAnno               
 
 
-def openAlignmentInPraat(wordAnnoURI, outputHTKPhoneAlignedURI, timeShift, pathToAudioFile):
+def addAlignmentResultToTextGridFIle(wordAnnoURI, outputHTKPhoneAlignedURI, timeShift):
    
     outputHTKPhoneAlignedNoExt = os.path.splitext(outputHTKPhoneAlignedURI)[0]
     wordAlignedfileName, phonemeAlignedfileName = prepareOutputForPraat(outputHTKPhoneAlignedNoExt, timeShift)
     
-    _openAlignmentInPraat(wordAnnoURI,wordAlignedfileName, timeShift, pathToAudioFile)
+    _addAlignmentResultToTextGrid(wordAnnoURI,wordAlignedfileName, timeShift)
     
+    
+
     '''
     call Praat script to: 
     -open phoneLevel.annotation file  .TextGrid
@@ -103,10 +105,9 @@ def openAlignmentInPraat(wordAnnoURI, outputHTKPhoneAlignedURI, timeShift, pathT
     -add the result as tier in the TextGrid
     -save the new file as .comparison.TextGrid
     
-    open Praat to visualize it 
     '''
     
-def _openAlignmentInPraat(wordAnnoURI, wordAlignedfileName, timeShift, pathToAudioFile):
+def _addAlignmentResultToTextGrid(wordAnnoURI, wordAlignedfileName, timeShift):
     
      
     ########### call praat script to add alignment as a new layer to existing annotation TextGrid
@@ -132,7 +133,13 @@ def _openAlignmentInPraat(wordAnnoURI, wordAlignedfileName, timeShift, pathToAud
     pipe =subprocess.Popen(command)
     pipe.wait()
     
-    # open comparison.TextGrid in  praat. OPTIONAL
+    return alignedResultPath, fileNameWordAnno
+    
+    
+def openTextGridInPraat(alignedResultPath, fileNameWordAnno, pathToAudioFile):
+    '''     open Praat to visualize it (done for MAC OS X)
+    '''
+    
     comparisonTextGridURI =  os.path.join(alignedResultPath, fileNameWordAnno)  + PHRASE_ANNOTATION_EXT
     pipe = subprocess.Popen(["open", '-a', PATH_TO_PRAAT, comparisonTextGridURI])
     pipe.wait()
