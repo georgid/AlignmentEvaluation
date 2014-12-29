@@ -67,34 +67,34 @@ def mlf2PraatFormat( listTsAndPhonemes, timeShift, baseNameAudioFile, whichSuffi
     # timeshift
     for index in range(len(listTsAndPhonemes)):
         listTsAndPhonemes[index][0] = listTsAndPhonemes[index][0] + timeShift
-        if (len(listTsAndPhonemes[index]) == 3): 
-            del listTsAndPhonemes[index][1]
+#         if (len(listTsAndPhonemes[index]) == 3): 
+#             del listTsAndPhonemes[index][1]
         
     phonemeAlignedfileName = baseNameAudioFile + whichSuffix
     
-    writeListOfListToTextFile(listTsAndPhonemes, 'startTs phonemeOrWord\n', phonemeAlignedfileName)
+    writeListOfListToTextFile(listTsAndPhonemes, 'startTs endTs phonemeOrWord\n', phonemeAlignedfileName)
     logging.debug('phoneme level alignment written to file: ',  phonemeAlignedfileName)
     return phonemeAlignedfileName
 
     
     
-def addAlignmentResultToTextGrid(detectedTokenList,  wordAnnoURI, pathToAudioFile):
+def addAlignmentResultToTextGrid(detectedTokenList,  wordAnnoURI, pathToAudioFile, tierNameWordAligned, tierNamePhonemeAligned):
     '''
     same as addAlignmentResultToTextGridFIle, but
     instead of file with outputHTKPhoneAlignedURI use python list: @param detectedTokenList
     '''
     baseNameAudioFile = os.path.splitext(pathToAudioFile)[0]
     wordAlignedfileName=  mlf2PraatFormat(detectedTokenList, 0, baseNameAudioFile, WORD_ALIGNED_SUFFIX)
-    alignedResultPath, fileNameWordAnno = _addAlignmentResultToTextGrid(wordAnnoURI,wordAlignedfileName, 0)  
+    alignedResultPath, fileNameWordAnno = _addAlignmentResultToTextGrid(wordAnnoURI,wordAlignedfileName, tierNameWordAligned, tierNamePhonemeAligned, 0)  
     return alignedResultPath, fileNameWordAnno               
 
 
-def addAlignmentResultToTextGridFIle(wordAnnoURI, outputHTKPhoneAlignedURI, timeShift):
+def addAlignmentResultToTextGridFIle(wordAnnoURI, outputHTKPhoneAlignedURI, timeShift, tierNameWordAligned, tierNamePhonemeAligned,):
    
     outputHTKPhoneAlignedNoExt = os.path.splitext(outputHTKPhoneAlignedURI)[0]
     wordAlignedfileName, phonemeAlignedfileName = prepareOutputForPraat(outputHTKPhoneAlignedNoExt, timeShift)
     
-    _addAlignmentResultToTextGrid(wordAnnoURI,wordAlignedfileName, timeShift)
+    _addAlignmentResultToTextGrid(wordAnnoURI,wordAlignedfileName, timeShift, tierNameWordAligned, tierNamePhonemeAligned)
     
     
 
@@ -107,7 +107,7 @@ def addAlignmentResultToTextGridFIle(wordAnnoURI, outputHTKPhoneAlignedURI, time
     
     '''
     
-def _addAlignmentResultToTextGrid(wordAnnoURI, wordAlignedfileName, timeShift):
+def _addAlignmentResultToTextGrid(wordAnnoURI, wordAlignedfileName, tierNameWordAligned, tierNamePhonemeAligned, timeShift=0 ):
     
      
     ########### call praat script to add alignment as a new layer to existing annotation TextGrid
@@ -124,12 +124,12 @@ def _addAlignmentResultToTextGrid(wordAnnoURI, wordAlignedfileName, timeShift):
     fileNameWordAnno = os.path.splitext(os.path.basename(wordAnnoURI))[0]
     
     # in praat script extensions  WORD_ALIGNED_SUFFIX  is added automatically
-    command = [PATH_TO_PRAAT, PATH_TO_PRAAT_SCRIPT, alignedResultPath, fileNameWordAnno,  alignedFileBaseName, WORD_ALIGNED_SUFFIX ]
+    command = [PATH_TO_PRAAT, PATH_TO_PRAAT_SCRIPT, alignedResultPath, fileNameWordAnno,  alignedFileBaseName, WORD_ALIGNED_SUFFIX, tierNameWordAligned ]
     pipe = subprocess.Popen(command)
     pipe.wait()
     
     # same praat script for PHONEME_ALIGNED_SUFFIX
-    command = [ PATH_TO_PRAAT, PATH_TO_PRAAT_SCRIPT, alignedResultPath, fileNameWordAnno,  alignedFileBaseName, PHONEME_ALIGNED_SUFFIX ]
+    command = [ PATH_TO_PRAAT, PATH_TO_PRAAT_SCRIPT, alignedResultPath, fileNameWordAnno,  alignedFileBaseName, PHONEME_ALIGNED_SUFFIX, tierNamePhonemeAligned ]
     pipe =subprocess.Popen(command)
     pipe.wait()
     

@@ -21,6 +21,9 @@ word phraseAnno kani_karaca-cargah_tevsih
 comment Enter phonemeAligned for phoneme-level and wordAligned for word-level
 word wordExtension .wordAligned
 
+comment Enter tierName
+word tierName aligned
+
 endform 
 
 ############################################ read form form#############
@@ -41,11 +44,11 @@ Read from file... 'pathTofiles$'/'phraseAnno$'.TextGrid
 
 selectObject("Table " + wordFileName$)
 
-print 'wordFileName$'
+#print 'wordFileName$'
 
 selectObject("TextGrid " + phraseAnno$)
 lastTierNumber = do("Get number of tiers")
-do("Insert interval tier...",lastTierNumber+1,"aligned")
+do("Insert interval tier...",lastTierNumber+1, 'tierName$')
  #lastTier$ = do$("Get tier name...", tiers)
 
 
@@ -53,16 +56,25 @@ do("Insert interval tier...",lastTierNumber+1,"aligned")
 selectObject("Table " + wordFileName$)
 numInervals = do("Get number of rows")
 
+startTs=do("Get value...", 1,"startTs")
+
+if startTs == 0.0
+	print 'startTs'
+	startTs = 0.001
+	print 'startTs'
+endif
+
+# TODO: check that startTs != 0
+selectObject("TextGrid " + phraseAnno$)
+do("Insert boundary...", lastTierNumber+1, startTs)
 
 
 # boundary at 0 and end exist by default in praat
-for i from 2 to numInervals
+for i from 1 to numInervals
 
-	selectObject("Table " + wordFileName$)
+	selectObject("Table " + wordFileName$)	
 
-	
-
-	startTs=do("Get value...", i,"startTs")
+	endTs=do("Get value...", i,"endTs")
 	#endTs=do("Get value...", i,"endTs")
 	# word1$=do("Get value...",i,"phonemeOrWord")
 	# print 'startTs'
@@ -81,15 +93,18 @@ for i from 2 to numInervals
 
 	selectObject("TextGrid " + phraseAnno$)
 
-	do("Insert boundary...", lastTierNumber+1, startTs)
+	# TODO :chekc that endTs <= audioLength
+	do("Insert boundary...", lastTierNumber+1, endTs)
 	# do("Set interval text...",lastTierNumber+1,i,split.array$[2])
-	do("Set interval text...",lastTierNumber+1,i,word1$)
+	do("Set interval text...",lastTierNumber+1,i+1,word1$)
 	
 
 
 
 
 endfor
+
+
 
 # save new TextGrid in the same dir as the result aligned
 selectObject("TextGrid " + phraseAnno$)

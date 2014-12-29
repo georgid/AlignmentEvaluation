@@ -12,6 +12,7 @@ import sys
 import numpy
 from PraatVisualiser import mlf2PhonemesAndTsList, mlf2WordAndTsList,\
     addAlignmentResultToTextGridFIle
+import logging
 
 
 # this allows path to packages to be resolved correctly (on import) from outside of eclipse 
@@ -125,12 +126,13 @@ TODO: eval performance of end timest. only and compare with begin ts.
                 annotationTokenListNoPauses.append(annoTsAndToken)
     
     if len(annotationTokenListNoPauses) == 0:
-        sys.exit(annotationURI + ' is empty!')
+        logging.warn(annotationURI + ' is empty!')
+        return alignmentErrors
     
     
     if len(detectedTokenListNoPauses) == 0:
-        sys.exit(' detected wotd list is empty!')
-      
+        logging.warn(' detected wotd list is empty!')
+        return alignmentErrors
     
     # loop in tokens of annotation
     currentWordNumber = 0
@@ -196,7 +198,9 @@ def evalOneFile(argv):
         
         
          ### OPTIONAL : open detection and annotation in praat. can be provided on request
-        addAlignmentResultToTextGridFIle(annoURI, detectedURI, 0, audio_URI)
+        tierNameWordAligned = 'wordAligned'
+        tierNamePhonemeAligned =  'phonemeAligned'
+        addAlignmentResultToTextGridFIle(annoURI, detectedURI, 0, audio_URI, tierNameWordAligned, tierNamePhonemeAligned)
         
         return mean, stDev,  median, alignmentErrors
     
