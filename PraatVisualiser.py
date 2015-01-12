@@ -33,7 +33,7 @@ sys.path.append(pathUtils )
 
 from Utilz import writeListOfListToTextFile, loadTextFile 
    
-def prepareOutputForPraat(baseNameAudioFile, timeShift):
+def prepareOutputForPraat(outputHTKPhoneAlignedURI, timeShift):
         '''
         parse output in HTK's mlf output format ; load into list; 
         serialize into table format easy to load from praat: 
@@ -42,17 +42,19 @@ def prepareOutputForPraat(baseNameAudioFile, timeShift):
         - phoneme level
         
         '''    
-       
     ################ parse mlf and write word-level text file    
-        listTsAndWords = mlf2WordAndTsList(baseNameAudioFile + HTK_MLF_ALIGNED_SUFFIX)
+       
+        listTsAndWords = mlf2WordAndTsList(outputHTKPhoneAlignedURI)
         
+        
+        baseNameAudioFile = os.path.splitext(outputHTKPhoneAlignedURI)[0]
         wordAlignedfileName=  mlf2PraatFormat(listTsAndWords, timeShift, baseNameAudioFile, WORD_ALIGNED_SUFFIX)
     
       
     ########################## same for phoneme-level: 
         
         # with : phoneme-level alignment
-        listTsAndPhonemes = mlf2PhonemesAndTsList (baseNameAudioFile + HTK_MLF_ALIGNED_SUFFIX)
+        listTsAndPhonemes = mlf2PhonemesAndTsList (outputHTKPhoneAlignedURI)
         phonemeAlignedfileName=  mlf2PraatFormat(listTsAndPhonemes, timeShift, baseNameAudioFile, PHONEME_ALIGNED_SUFFIX)
         
         
@@ -91,9 +93,12 @@ def addAlignmentResultToTextGrid(detectedTokenList,  wordAnnoURI, pathToAudioFil
 
 
 def addAlignmentResultToTextGridFIle( outputHTKPhoneAlignedURI, wordAnnoURI, tierNameWordAligned, tierNamePhonemeAligned):
+    '''
+    called when HTK used and output written in mlf file
+    '''
     timeShift= 0
-    outputHTKPhoneAlignedNoExt = os.path.splitext(outputHTKPhoneAlignedURI)[0]
-    wordAlignedfileName, phonemeAlignedfileName = prepareOutputForPraat(outputHTKPhoneAlignedNoExt, timeShift)
+    
+    wordAlignedfileName, phonemeAlignedfileName = prepareOutputForPraat(outputHTKPhoneAlignedURI, timeShift)
     
     alignedResultPath, fileNameWordAnno = _alignmentResult2TextGrid(wordAnnoURI,wordAlignedfileName,  tierNameWordAligned, tierNamePhonemeAligned)
     return alignedResultPath, fileNameWordAnno 

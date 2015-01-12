@@ -48,7 +48,11 @@ git clone https://github.com/georgid/utilsLyrics.git
 
 
 ---------------------------------------- 
-EXAMPLE: if decoded result is:
+EXAMPLE USAGE: 
+
+see: main method of WordLevelEvlauator
+
+if decoded result is:
  
 startTs endTs phonemeOrWord
 0.0		1.11	sil
@@ -70,3 +74,6 @@ and
 To change extensions edit variables in WordLevelEvaluator 
 ANNOTATION_EXT = '.TextGrid'
 DETECTED_EXT = '.dtwDurationAligned'
+
+As well make sure to change the path to your Praat program:
+

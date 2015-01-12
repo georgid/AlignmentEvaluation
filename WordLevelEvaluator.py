@@ -30,6 +30,7 @@ from Utilz import getMeanAndStDevError
 
 ANNOTATION_EXT = '.TextGrid'
 DETECTED_EXT = '.dtwDurationsAligned'
+AUDIO_EXT = '.wav'
 
 ##################################################################################
 
@@ -198,11 +199,11 @@ def evalOneFile(argv):
         
         
          ### OPTIONAL : open detection and annotation in praat. can be provided on request
-        tierNameWordAligned = 'wordAligned'
-        tierNamePhonemeAligned =  'phonemeAligned'
+        tierNameWordAligned = '"wordAligned"'
+        tierNamePhonemeAligned =  '"phonemeAligned"'
         alignedResultPath, fileNameWordAnno = addAlignmentResultToTextGridFIle( detectedURI, annoURI,   tierNameWordAligned, tierNamePhonemeAligned)
         
-        openTextGridInPraat(alignedResultPath, fileNameWordAnno, audio_URI + '.wav')
+        openTextGridInPraat(alignedResultPath, fileNameWordAnno, audio_URI)
         
         return mean, stDev,  median, alignmentErrors
     
@@ -213,22 +214,19 @@ def evalOneFile(argv):
 
 if __name__ == '__main__':
     
-    evalOneFile(sys.argv)
+#     evalOneFile(sys.argv)
     
+    ########## example usage: 
+    PATH_TEST_DATASET = 'example/'
+     
+    audioName = '01_Bakmiyor_3_nakarat'
+    annotationURI = os.path.join(PATH_TEST_DATASET,  audioName + ANNOTATION_EXT)
+    detectedURI = os.path.join(PATH_TEST_DATASET,  audioName +  DETECTED_EXT)
+    audioURI = os.path.join(PATH_TEST_DATASET,  audioName + AUDIO_EXT)
+ 
+
+    mean, stDev,  median, alignmentErrors  = evalOneFile([__file__, annotationURI, detectedURI, tierAliases.wordLevel, audioURI ])
     
-#     PATH_TEST_DATASET = '/Users/joro/Documents/Phd/UPF/adaptation_data_soloVoice/ISTANBUL/goekhan/'
-#     PATH_TEST_DATASET = '/Users/joro/Documents/Phd/UPF/adaptation_data_soloVoice/ISTANBUL/safiye/'
-#     
-#     audioName = ''
-#     annotationURI = os.path.join(PATH_TEST_DATASET,  audioName + ANNOTATION_EXT)
-#     detectedURI = os.path.join(PATH_TEST_DATASET,  audioName +  DETECTED_EXT)
-#      
-# #     annotationURI = '/Volumes/IZOTOPE/sertan_sarki/segah--sarki--curcuna--olmaz_ilac--haci_arif_bey/21_Recep_Birgit_-_Olmaz_Ilac_Sine-i_Sad_Pareme/21_Recep_Birgit_-_Olmaz_Ilac_Sine-i_Sad_Pareme_meyan2_from_69_194485_to_79_909261.TextGrid'
-# #     detectedURI = '~//Downloads/blah'
-# #      
-#     mean, stDev,  median, alignmentErrors  = evalOneFile(argv[1], argv[2], argv[3])
-# #     mean, stDev,  median, alignmentErrors  = evalOneFile(annotationURI, detectedURI, tierAliases.wordLevel)
-#     
 
 
     
