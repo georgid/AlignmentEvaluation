@@ -56,6 +56,7 @@ def prepareOutputForPraat(baseNameAudioFile, timeShift):
         phonemeAlignedfileName=  mlf2PraatFormat(listTsAndPhonemes, timeShift, baseNameAudioFile, PHONEME_ALIGNED_SUFFIX)
         
         
+        
         return wordAlignedfileName, phonemeAlignedfileName
 
 
@@ -85,17 +86,17 @@ def addAlignmentResultToTextGrid(detectedTokenList,  wordAnnoURI, pathToAudioFil
     '''
     baseNameAudioFile = os.path.splitext(pathToAudioFile)[0]
     wordAlignedfileName=  mlf2PraatFormat(detectedTokenList, 0, baseNameAudioFile, WORD_ALIGNED_SUFFIX)
-    alignedResultPath, fileNameWordAnno = _addAlignmentResultToTextGrid(wordAnnoURI,wordAlignedfileName, tierNameWordAligned, tierNamePhonemeAligned, 0)  
+    alignedResultPath, fileNameWordAnno = _alignmentResult2TextGrid(wordAnnoURI,wordAlignedfileName, tierNameWordAligned, tierNamePhonemeAligned, 0)  
     return alignedResultPath, fileNameWordAnno               
 
 
-def addAlignmentResultToTextGridFIle(wordAnnoURI, outputHTKPhoneAlignedURI, timeShift, tierNameWordAligned, tierNamePhonemeAligned,):
-   
+def addAlignmentResultToTextGridFIle( outputHTKPhoneAlignedURI, wordAnnoURI, tierNameWordAligned, tierNamePhonemeAligned):
+    timeShift= 0
     outputHTKPhoneAlignedNoExt = os.path.splitext(outputHTKPhoneAlignedURI)[0]
     wordAlignedfileName, phonemeAlignedfileName = prepareOutputForPraat(outputHTKPhoneAlignedNoExt, timeShift)
     
-    _addAlignmentResultToTextGrid(wordAnnoURI,wordAlignedfileName, timeShift, tierNameWordAligned, tierNamePhonemeAligned)
-    
+    alignedResultPath, fileNameWordAnno = _alignmentResult2TextGrid(wordAnnoURI,wordAlignedfileName,  tierNameWordAligned, tierNamePhonemeAligned)
+    return alignedResultPath, fileNameWordAnno 
     
 
     '''
@@ -107,7 +108,7 @@ def addAlignmentResultToTextGridFIle(wordAnnoURI, outputHTKPhoneAlignedURI, time
     
     '''
     
-def _addAlignmentResultToTextGrid(wordAnnoURI, wordAlignedfileName, tierNameWordAligned, tierNamePhonemeAligned, timeShift=0 ):
+def _alignmentResult2TextGrid(wordAnnoURI, wordAlignedfileName, tierNameWordAligned, tierNamePhonemeAligned ):
     
      
     ########### call praat script to add alignment as a new layer to existing annotation TextGrid

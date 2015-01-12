@@ -11,7 +11,7 @@ import os
 import sys
 import numpy
 from PraatVisualiser import mlf2PhonemesAndTsList, mlf2WordAndTsList,\
-    addAlignmentResultToTextGridFIle
+    addAlignmentResultToTextGridFIle, openTextGridInPraat
 import logging
 
 
@@ -200,7 +200,9 @@ def evalOneFile(argv):
          ### OPTIONAL : open detection and annotation in praat. can be provided on request
         tierNameWordAligned = 'wordAligned'
         tierNamePhonemeAligned =  'phonemeAligned'
-        addAlignmentResultToTextGridFIle(annoURI, detectedURI, 0, audio_URI, tierNameWordAligned, tierNamePhonemeAligned)
+        alignedResultPath, fileNameWordAnno = addAlignmentResultToTextGridFIle( detectedURI, annoURI,   tierNameWordAligned, tierNamePhonemeAligned)
+        
+        openTextGridInPraat(alignedResultPath, fileNameWordAnno, audio_URI + '.wav')
         
         return mean, stDev,  median, alignmentErrors
     

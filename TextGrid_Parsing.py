@@ -37,8 +37,7 @@ def TextGrid2Dict(textgrid_file, outputFileName):
 
 '''
 parse textGrid into a python list of tokens 
-@param whichLevel : 0 -  phonemes,   2 - phrases
-TODO: implement: 1- words  
+@param whichLevel : 0 -  phonemes,   2 - phrases,  1- words  
 '''	
 def TextGrid2WordList(textgrid_file, whichLevel=2):
 		
