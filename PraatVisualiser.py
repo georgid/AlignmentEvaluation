@@ -88,7 +88,7 @@ def addAlignmentResultToTextGrid(detectedTokenList,  wordAnnoURI, pathToAudioFil
     '''
     baseNameAudioFile = os.path.splitext(pathToAudioFile)[0]
     wordAlignedfileName=  mlf2PraatFormat(detectedTokenList, 0, baseNameAudioFile, WORD_ALIGNED_SUFFIX)
-    alignedResultPath, fileNameWordAnno = _alignmentResult2TextGrid(wordAnnoURI,wordAlignedfileName, tierNameWordAligned, tierNamePhonemeAligned, 0)  
+    alignedResultPath, fileNameWordAnno = _alignmentResult2TextGrid(wordAnnoURI,wordAlignedfileName, tierNameWordAligned, tierNamePhonemeAligned)  
     return alignedResultPath, fileNameWordAnno               
 
 

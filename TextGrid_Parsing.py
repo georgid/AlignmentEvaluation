@@ -3,7 +3,6 @@
 import textgrid as tgp
 import sys, os
 
-from setuptools.command.easy_install import sys_executable
 sys.path.append(os.path.realpath('../Batch_Processing/'))
 # import Batch_Proc_Essentia as BP  # @UnresolvedImport
 
@@ -37,7 +36,7 @@ def TextGrid2Dict(textgrid_file, outputFileName):
 
 '''
 parse textGrid into a python list of tokens 
-@param whichLevel : 0 -  phonemes,   2 - phrases,  1- words  
+@param whichLevel : 0 -  phonemes,    1- words, 2 - phrases  
 '''	
 def TextGrid2WordList(textgrid_file, whichLevel=2):
 		
