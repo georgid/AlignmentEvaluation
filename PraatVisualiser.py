@@ -11,7 +11,7 @@ import shutil
 import subprocess
 
 # change path to where Praat is installed
-PATH_TO_PRAAT = '/Applications/Praat.app/Contents/MacOS/Praat'
+PATH_TO_PRAAT = '/Applications/Praat.app/Contents/MacOS/Praat2'
 
 parentDir = os.path.abspath(os.path.dirname(os.path.realpath(__file__ ) ) )
 PATH_TO_PRAAT_SCRIPT= os.path.join(parentDir, 'loadAlignedResultAndTextGrid.rb')
@@ -117,10 +117,14 @@ def addDetectionToAnnotationTextGrid(wordAlignedfileName, alignedResultPath, fil
     alignedFileBaseName = tokens_[0]
     alignedSuffix = tokens_[1]
 # in praat script extensions  alignedSuffix  is added automatically. use suffixName as tierName
+    
+    if not os.path.exists(PATH_TO_PRAAT):
+        logging.warning("Praat not found at given path {}, skipping opening Praat ..\n")
+        return
     command = [PATH_TO_PRAAT, PATH_TO_PRAAT_SCRIPT, alignedResultPath, fileNameWordAnno, alignedFileBaseName, alignedSuffix, '"' + alignedSuffix + '"']
     pipe = subprocess.Popen(command)
     pipe.wait()
-    return tokens_, alignedFileBaseName, alignedSuffix, command, pipe
+#     return tokens_, alignedFileBaseName, alignedSuffix, command, pipe
 
 def _alignmentResult2TextGrid(grTruthAnnoURI, wordAlignedfileName, phonemeAlignedfileName="" ):
     
