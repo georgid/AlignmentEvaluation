@@ -58,13 +58,14 @@ numInervals = do("Get number of rows")
 
 startTs=do("Get value...", 1,"startTs")
 
+# check that startTs != 0
 if startTs == 0.0
 	print 'startTs'
 	startTs = 0.001
 	print 'startTs'
 endif
+endTsPrev = startTs
 
-# TODO: check that startTs != 0
 selectObject("TextGrid " + phraseAnno$)
 do("Insert boundary...", lastTierNumber+1, startTs)
 
@@ -94,11 +95,16 @@ for i from 1 to numInervals
 	selectObject("TextGrid " + phraseAnno$)
 
 	# TODO :chekc that endTs <= audioLength
+	if endTs == endTsPrev
+	print 'endTs'
+	endTs = endTs + 0.001
+	
+endif 
 	do("Insert boundary...", lastTierNumber+1, endTs)
 	# do("Set interval text...",lastTierNumber+1,i,split.array$[2])
 	do("Set interval text...",lastTierNumber+1,i+1,word1$)
 	
-
+	endTsPrev = endTs
 
 
 

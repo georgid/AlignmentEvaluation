@@ -199,10 +199,11 @@ def evalOneFile(argv):
         
         
          ### OPTIONAL : open detection and annotation in praat. can be provided on request
-        tierNameWordAligned = '"wordAligned"'
-        tierNamePhonemeAligned =  '"phonemeAligned"'
-        alignedResultPath, fileNameWordAnno = addAlignmentResultToTextGridFIle( detectedURI, annoURI,   tierNameWordAligned, tierNamePhonemeAligned)
+        wordAlignedSuffix = '"wordsAligned"'
+        phonemeAlignedSuffix =  '"phonemesAligned"'
+        alignedResultPath, fileNameWordAnno = addAlignmentResultToTextGridFIle( detectedURI, annoURI,   wordAlignedSuffix, phonemeAlignedSuffix)
         
+         
         openTextGridInPraat(alignedResultPath, fileNameWordAnno, audio_URI)
         
         return mean, stDev,  median, alignmentErrors
