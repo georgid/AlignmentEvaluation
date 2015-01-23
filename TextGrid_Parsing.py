@@ -34,30 +34,30 @@ def TextGrid2Dict(textgrid_file, outputFileName):
 
 	outputFileHandle.close()		
 
-'''
-parse textGrid into a python list of tokens 
-@param whichLevel : 0 -  phonemes,    1- words, 2 - phrases  
-'''	
+
 def TextGrid2WordList(textgrid_file, whichLevel=2):
-		
-		beginTsAndWordList=[]
-		
-		par_obj = tgp.TextGrid.load(textgrid_file)	#loading the object	
-		tiers= tgp.TextGrid._find_tiers(par_obj)	#finding existing tiers		
-		
-		isTierFound = 0
-		for tier in tiers:
-		
-			if tier.tier_name() == tier_names[int(whichLevel)]:	#iterating over tiers and selecting the one specified
-				isTierFound = 1
-				tier_details = tier.make_simple_transcript();		#this function parse the file nicely and return cool tuples
-				
-				for line in tier_details:
-					beginTsAndWordList.append([line[0], line[1], line[2]])
-		
-		if not isTierFound:
-			sys.exit('tier in file {0} might not be named correctly. Name it {1}' .format(textgrid_file, tier_names[whichLevel]))
-		return beginTsAndWordList		
+    '''
+    parse textGrid into a python list of tokens 
+    @param whichLevel : 0 -  phonemes,    1- words, 2 - phrases  
+    '''	
+    if not os.path.isfile(textgrid_file): raise Exception("file {} not found".format(textgrid_file))
+    beginTsAndWordList=[]
+	
+    par_obj = tgp.TextGrid.load(textgrid_file)	#loading the object	
+    tiers= tgp.TextGrid._find_tiers(par_obj)	#finding existing tiers		
+	
+    isTierFound = 0
+    for tier in tiers:
+	
+		if tier.tier_name() == tier_names[int(whichLevel)]:	#iterating over tiers and selecting the one specified
+			isTierFound = 1
+			tier_details = tier.make_simple_transcript();		#this function parse the file nicely and return cool tuples
+			
+			for line in tier_details:
+				beginTsAndWordList.append([line[0], line[1], line[2]])
+    if not isTierFound:
+		raise Exception('tier in file {0} might not be named correctly. Name it {1}' .format(textgrid_file, tier_names[whichLevel]))
+    return beginTsAndWordList		
 
 
 ##################################################################################

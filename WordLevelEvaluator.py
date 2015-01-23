@@ -119,7 +119,10 @@ TODO: eval performance of end timest. only and compare with begin ts.
     ######################  
     # prepare list of phrases from ANNOTATION. remove empy annotaion tokens 
     
-    annotationTokenListA = TextGrid2WordList(annotationURI, whichLevel)     
+    try:
+        annotationTokenListA = TextGrid2WordList(annotationURI, whichLevel)
+    except Exception as e:
+        sys.exit(e.message)     
     
     annotationTokenListNoPauses = []
     for annoTsAndToken in annotationTokenListA:

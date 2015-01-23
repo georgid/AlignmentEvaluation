@@ -48,7 +48,7 @@ selectObject("Table " + wordFileName$)
 
 selectObject("TextGrid " + phraseAnno$)
 lastTierNumber = do("Get number of tiers")
-do("Insert interval tier...",lastTierNumber+1, 'tierName$')
+do("Insert interval tier...",1, 'tierName$')
  #lastTier$ = do$("Get tier name...", tiers)
 
 

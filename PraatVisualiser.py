@@ -11,12 +11,11 @@ import shutil
 import subprocess
 
 # change path to where Praat is installed
-PATH_TO_PRAAT = '/Applications/Praat.app/Contents/MacOS/Praat2'
+PATH_TO_PRAAT = '/Applications/Praat.app/Contents/MacOS/Praat'
 
 parentDir = os.path.abspath(os.path.dirname(os.path.realpath(__file__ ) ) )
 PATH_TO_PRAAT_SCRIPT= os.path.join(parentDir, 'loadAlignedResultAndTextGrid.rb')
 
-print PATH_TO_PRAAT_SCRIPT
 
 HTK_MLF_ALIGNED_SUFFIX= ".htkAlignedMlf"
  
@@ -44,21 +43,21 @@ def prepareOutputForPraat(outputHTKPhoneAlignedURI, wordAlignedSuffix, phonemeAl
         
         
         baseNameAudioFile = os.path.splitext(outputHTKPhoneAlignedURI)[0]
-        wordAlignedfileName=  mlf2PraatFormat(listTsAndWords, baseNameAudioFile, wordAlignedSuffix)
+        wordAlignedfileName=  mlf2TabFormat(listTsAndWords, baseNameAudioFile, wordAlignedSuffix)
     
       
     ########################## same for phoneme-level: 
         
         # with : phoneme-level alignment
         listTsAndPhonemes = mlf2PhonemesAndTsList (outputHTKPhoneAlignedURI)
-        phonemeAlignedfileName=  mlf2PraatFormat(listTsAndPhonemes, baseNameAudioFile, phonemeAlignedSuffix)
+        phonemeAlignedfileName=  mlf2TabFormat(listTsAndPhonemes, baseNameAudioFile, phonemeAlignedSuffix)
         
         
         
         return wordAlignedfileName, phonemeAlignedfileName
 
 
-def mlf2PraatFormat( listTsAndPhonemes,  baseNameAudioFile, whichSuffix):
+def mlf2TabFormat( listTsAndPhonemes,  baseNameAudioFile, whichSuffix):
     '''
     convenience method
     '''
@@ -83,7 +82,7 @@ def addAlignmentResultToTextGrid(detectedTokenList,  grTruthAnnoURI, tokenAligne
     instead of file with outputHTKPhoneAlignedURI use python list: @param detectedTokenList
     '''
     baseNameAudioFile = os.path.splitext(grTruthAnnoURI)[0]
-    tokenAlignedfileName=  mlf2PraatFormat(detectedTokenList, baseNameAudioFile, tokenAlignedSuffix)
+    tokenAlignedfileName=  mlf2TabFormat(detectedTokenList, baseNameAudioFile, tokenAlignedSuffix)
     
     alignedResultPath, fileNameWordAnno = _alignmentResult2TextGrid(grTruthAnnoURI, tokenAlignedfileName)  
     return alignedResultPath, fileNameWordAnno               
@@ -127,7 +126,12 @@ def addDetectionToAnnotationTextGrid(wordAlignedfileName, alignedResultPath, fil
 #     return tokens_, alignedFileBaseName, alignedSuffix, command, pipe
 
 def _alignmentResult2TextGrid(grTruthAnnoURI, wordAlignedfileName, phonemeAlignedfileName="" ):
-    
+    '''
+    create a tier from list with detections @param wordAlignedfileName and add it to TextGrid grTruthAnnoURI
+    '''
+    if not os.path.exists(grTruthAnnoURI):
+        sys.exit(" ground truth annotation file {} does not exist. cannot add alignment to it ".format (grTruthAnnoURI))
+        
      
     ########### call praat script to add alignment as a new layer to existing annotation TextGrid
     alignedResultPath = os.path.dirname(wordAlignedfileName)
@@ -156,6 +160,7 @@ def _alignmentResult2TextGrid(grTruthAnnoURI, wordAlignedfileName, phonemeAligne
 def openTextGridInPraat(alignedResultPath, fileNameWordAnno, pathToAudioFile):
     '''     open Praat to visualize it (done for MAC OS X)
     '''
+    print PATH_TO_PRAAT
     if not os.path.exists(PATH_TO_PRAAT):
         logging.warning("Praat not found at given path {}, skipping opening Praat ..\n")
         return
