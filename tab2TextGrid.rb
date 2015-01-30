@@ -31,6 +31,7 @@ Read Table from whitespace-separated file... 'pathTofiles$'/'wordFileName$''word
 # Read audio from file
 
 Read from file... 'pathTofiles$'/'wordFileName$'.wav
+endTime=do("Get end time")
 
 # create text Grid
 To TextGrid... 'pathTofiles$'/'wordFileName$'.TextGrid
@@ -76,12 +77,20 @@ for i from 1 to numInervals
 
 	selectObject("TextGrid " + wordFileName$)
 
-	# TODO :chekc that endTs <= audioLength
+	#  :chekc that endTs <= audioLength
+	if endTs > endTime
+		endTs = endTime - 0.001
+	endif
+
 	if endTs == endTsPrev
-	print 'endTs'
-	endTs = endTs + 0.001
+		print 'endTs'
+		endTs = endTs + 0.001
 	
-endif 
+	endif 
+	
+
+	
+
 	do("Insert boundary...", lastTierNumber+1, endTs)
 	do("Set interval text...",lastTierNumber+1,i+1,word1$)
 	

@@ -48,8 +48,8 @@ def TextGrid2WordList(textgrid_file, whichLevel=2):
 	
     isTierFound = 0
     for tier in tiers:
-	
-		if tier.tier_name() == tier_names[int(whichLevel)]:	#iterating over tiers and selecting the one specified
+        tierName= tier.tier_name().replace('.','')
+        if tierName == tier_names[int(whichLevel)]:	#iterating over tiers and selecting the one specified
 			isTierFound = 1
 			tier_details = tier.make_simple_transcript();		#this function parse the file nicely and return cool tuples
 			
