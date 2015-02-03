@@ -121,8 +121,8 @@ TODO: eval performance of end timest. only and compare with begin ts.
     
     try:
         annotationTokenListA = TextGrid2WordList(annotationURI, whichLevel)
-    except Exception as e:
-        sys.exit(e.message)     
+    except Exception, errorMsg:
+        sys.exit(str(errorMsg))     
     
     annotationTokenListNoPauses = []
     for annoTsAndToken in annotationTokenListA:
