@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 '''
 Created on Mar 5, 2014
 
@@ -92,6 +93,11 @@ def loadDetectedTokenListFromMlf( detectedURI, whichLevel=2 ):
     return detectedWordList
         
 
+
+
+
+
+
 def _evalAlignmentError(annotationURI, detectedTokenList, whichLevel=2 ):
     '''
 Calculate alignment errors. Does not check token identities, but proceeds successively one-by-one  
@@ -113,7 +119,8 @@ TODO: eval performance of end timest. only and compare with begin ts.
     # prepare list of detected tokens. remove detected tokens NOISE, sil, sp entries from  detectedTokenList
     detectedTokenListNoPauses = []   #result 
     for detectedTsAndToken in detectedTokenList:
-        if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE':
+        if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE' \
+            and detectedTsAndToken[2] != '_SAZ_' :
             detectedTokenListNoPauses.append(detectedTsAndToken)
 
     ######################  
@@ -125,9 +132,9 @@ TODO: eval performance of end timest. only and compare with begin ts.
         sys.exit(str(errorMsg))     
     
     annotationTokenListNoPauses = []
-    for annoTsAndToken in annotationTokenListA:
-        if annoTsAndToken[2] != "" and not(annoTsAndToken[2].isspace()): # skip empty phrases
-                annotationTokenListNoPauses.append(annoTsAndToken)
+    for currAnnoTsAndToken in annotationTokenListA:
+        if currAnnoTsAndToken[2] != "" and not(currAnnoTsAndToken[2].isspace()): # skip empty phrases
+                annotationTokenListNoPauses.append(currAnnoTsAndToken)
     
     if len(annotationTokenListNoPauses) == 0:
         logging.warn(annotationURI + ' is empty!')
@@ -138,36 +145,54 @@ TODO: eval performance of end timest. only and compare with begin ts.
         logging.warn(' detected wotd list is empty!')
         return alignmentErrors
     
-    # loop in tokens of annotation
+    # loop in tokens of gr truth annotation
     currentWordNumber = 0
-    for annoTsAndToken in annotationTokenListNoPauses:
+    for currAnnoTsAndToken in annotationTokenListNoPauses:
        
-        annoTsAndToken[2] = annoTsAndToken[2].strip()
-        subtokens = annoTsAndToken[2].split(" ")
+        currAnnoTsAndToken[2] = currAnnoTsAndToken[2].strip()
+        subtokens = currAnnoTsAndToken[2].split()
         numWordsInPhrase = len(subtokens)
         
         if numWordsInPhrase == 0:
-            sys.exit('token with no sutokens in annotation file!')
+            sys.exit('token (phrase) with no subtokens (words) in annotation file!')
         
-        if  currentWordNumber + 1 > len(detectedTokenListNoPauses):
-            sys.exit('more tokens (words/phrases/phonemes) detected than in annotation. No evaluation possible')
+        if  currentWordNumber >= len(detectedTokenListNoPauses):
+            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( currentWordNumber, len(detectedTokenListNoPauses)))
             
-        detectedTsAndToken = detectedTokenListNoPauses[currentWordNumber]
         
-        # calc difference phrase begin Ts (0) and endTs (1)
-        for i in (0,1):
-            annotatedTs = annoTsAndToken[i]
-            detectedTs = detectedTsAndToken[i]
-
-            currAlignmentError = calcError(annotatedTs, detectedTs)
-            alignmentErrors.append(currAlignmentError)
+        beginAlignmentError, endAlignmentError = calcErrorBeginAndEndTs(detectedTokenListNoPauses, currAnnoTsAndToken, currentWordNumber, numWordsInPhrase)        
         
-        
+        alignmentErrors.append(beginAlignmentError)
+        alignmentErrors.append(endAlignmentError)
         
         #### UPDATE: proceed in detection the number of subtokens in current token          
         currentWordNumber +=numWordsInPhrase
+    
+    # sanity check: 
+    if currentWordNumber != len(detectedTokenListNoPauses):
+            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( currentWordNumber, len(detectedTokenListNoPauses)))
+
                 
     return  alignmentErrors
+
+
+def calcErrorBeginAndEndTs(detectedTokenListNoPauses, annoTsAndToken, currentWordNumber, numWordsInPhrase):
+    '''
+    @param annoTsAndToken: - might have 1 or more tokens 
+    @param detectedTokenListNoPauses:  list of tokens. here reference only the relevant beginning and ending tokens
+    '''
+    # calc difference phrase begin Ts
+    annotatedTs = annoTsAndToken[0]
+    detectedTs = detectedTokenListNoPauses[currentWordNumber][0]
+    beginAlignmentError = calcError(annotatedTs, detectedTs)
+    
+    # calc difference phrase endTs (1)
+    annotatedTs = annoTsAndToken[1]
+    detectedTs = detectedTokenListNoPauses[currentWordNumber + numWordsInPhrase - 1][1]
+    endAlignmentError = calcError(annotatedTs, detectedTs)
+    
+    return beginAlignmentError, endAlignmentError
+
         
 
 def calcError(annotatedTokenTs, detectedTokenTs):
@@ -202,12 +227,12 @@ def evalOneFile(argv):
         
         
          ### OPTIONAL : open detection and annotation in praat. can be provided on request
-        wordAlignedSuffix = '"wordsAligned"'
-        phonemeAlignedSuffix =  '"phonemesAligned"'
-        alignedResultPath, fileNameWordAnno = addAlignmentResultToTextGridFIle( detectedURI, annoURI,   wordAlignedSuffix, phonemeAlignedSuffix)
-        
-         
-        openTextGridInPraat(alignedResultPath, fileNameWordAnno, audio_URI)
+#         wordAlignedSuffix = '"wordsAligned"'
+#         phonemeAlignedSuffix =  '"phonemesAligned"'
+#         alignedResultPath, fileNameWordAnno = addAlignmentResultToTextGridFIle( detectedURI, annoURI,   wordAlignedSuffix, phonemeAlignedSuffix)
+#         
+#          
+#         openTextGridInPraat(alignedResultPath, fileNameWordAnno, audio_URI)
         
         return mean, stDev,  median, alignmentErrors
     
@@ -217,23 +242,65 @@ def evalOneFile(argv):
 ##################################################################################
 
 if __name__ == '__main__':
-    
+###########    test eval  with lists
+    # TODO: do a unit test here and put in example folder
+#     #    
+#        
+########### test eval with files
+ 
 #     evalOneFile(sys.argv)
     
-    ########## example usage: 
+    ########## 1 example with detected mlf file: 
+#     PATH_TEST_DATASET = 'example/'
+#       
+#     audioName = '01_Bakmiyor_3_nakarat'
+#     annotationURI = os.path.join(PATH_TEST_DATASET,  audioName + ANNOTATION_EXT)
+#     detectedURI = os.path.join(PATH_TEST_DATASET,  audioName +  DETECTED_EXT)
+#     audioURI = os.path.join(PATH_TEST_DATASET,  audioName + AUDIO_EXT)
+#   
+#  
+#     mean, stDev,  median, alignmentErrors  = evalOneFile([__file__, annotationURI, detectedURI, tierAliases.wordLevel, audioURI ])
+#      
+    ############### 2  example with detected tsv file
+#     PATH_TEST_DATASET = 'example/'
+#       
+#     audioName = '05_Semahat_Ozdenses_-_Bir_Ihtimal_Daha_Var_0_zemin_from_69_5205_to_84_2'
+#     annotationURI = os.path.join(PATH_TEST_DATASET,  audioName + ANNOTATION_EXT)
+#     
+#     # TODO: load from file
+# #     detectedURI = os.path.join(PATH_TEST_DATASET,  audioName +  '.phrasesDurationAligned')
+#   
+#     detectedList =   [[0.61, 0.94, u'Bir'], [1.02, 3.41, u'ihtimal'], [3.42, 4.11, u'daha'], [4.12, 5.4, u'var'], [5.5, 7.93, '_SAZ_'], \
+#     [8.03, 8.42, u'o'], [8.46, 8.83, u'da'], [8.86, 10.65, u'\xf6lmek'], [10.66, 11.04, u'mi'], [11.05, 14.39, u'dersin']]
+#     
+#        
+#     alignmentErrors = _evalAlignmentError(annotationURI, detectedList, tierAliases.phraseLevel)
+#     mean, stDev, median = getMeanAndStDevError(alignmentErrors)
+#         
+#     print  mean, " ", stDev
+    
+ ############### 3  other example with detected tsv file
     PATH_TEST_DATASET = 'example/'
-     
-    audioName = '01_Bakmiyor_3_nakarat'
+      
+    audioName = '01_Bakmiyor_0_zemin'
     annotationURI = os.path.join(PATH_TEST_DATASET,  audioName + ANNOTATION_EXT)
-    detectedURI = os.path.join(PATH_TEST_DATASET,  audioName +  DETECTED_EXT)
-    audioURI = os.path.join(PATH_TEST_DATASET,  audioName + AUDIO_EXT)
- 
-
-    mean, stDev,  median, alignmentErrors  = evalOneFile([__file__, annotationURI, detectedURI, tierAliases.wordLevel, audioURI ])
     
+    # TODO: load from file
+#     detectedURI = os.path.join(PATH_TEST_DATASET,  audioName +  '.phrasesDurationAligned')
+  
+        
 
-
+    detectedList =    [ [0.386834650351, 0.996834650351,    '_SAZ_'],
+                     [0.996834650351,3.17683465035,    u'Bakmıyor'],
+                      [3.17683465035,3.82683465035,  u'çeşm'],
+                      [3.82683465035,4.44683465035,    'i'],
+                      [4.44683465035,6.02683465035,    'siyah'],
+                      [6.02683465035,11.5068346504,    u'feryâde']]
     
+    alignmentErrors = _evalAlignmentError(annotationURI, detectedList, tierAliases.phraseLevel)
+    mean, stDev, median = getMeanAndStDevError(alignmentErrors)
+        
+    print  mean, " ", stDev
     
     ############# FROM HERE ON: old testing code for word-level eval 
 #     tmpMLF= '/Users/joro/Documents/Phd/UPF/turkish-makam-lyrics-2-audio-test-data/muhayyerkurdi--sarki--duyek--ruzgar_soyluyor--sekip_ayhan_ozisik/1-05_Ruzgar_Soyluyor_Simdi_O_Yerlerde/1-05_Ruzgar_Soyluyor_Simdi_O_Yerlerde_nakarat2_from_192.962376_to_225.170507.phone-level.output'
