@@ -1,4 +1,5 @@
 #include /Users/joro/Documents/Phd/UPF/voxforge/myScripts/praat/splitString.rb
+# deprecated due to error on opening word-level files... use instead tab2TextGrid
 include splitString.rb
 ##########################form ##################################
 form Specify .phraseAnno.TextGrid and wordExtension

@@ -25,7 +25,7 @@ pathUtils = os.path.join(parentDir,  'utilsLyrics')
 sys.path.append(pathUtils )
 
 
-from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList
+from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tier_names
 from Utilz import getMeanAndStDevError
 
 
@@ -43,9 +43,29 @@ class Enumerate(object):
 
 tierAliases = Enumerate("phonemeLevel wordLevel phraseLevel")
 
+
+def determineSuffix(withDuration, withSynthesis, evalLevel):
+    '''
+    lookup suffix for result files  depending on which algorithm used
+    '''    
+    evalLevelToken = tier_names[evalLevel]
+    if withDuration:
+        if withSynthesis:
+            tokenAlignedSuffix =  '.' + evalLevelToken + 'DurationSynthAligned'
+            phonemesAlignedSuffix = '.phonemesDurationSynthAligned'
+        else:
+            tokenAlignedSuffix = '.' + evalLevelToken + 'DurationAligned'
+            phonemesAlignedSuffix = '.phonemesDurationAligned'
+    else:
+        tokenAlignedSuffix = '.' + evalLevelToken + 'Aligned'
+        phonemesAlignedSuffix = '.phonemesAligned'
+    return tokenAlignedSuffix, phonemesAlignedSuffix
+
+
 '''
 calculate evaluation metric
 For now works only with begin ts
+@deprecated
 '''
 def wordsList2avrgTxt(annotationWordList, detectedWordList):
     
@@ -87,10 +107,12 @@ def loadDetectedTokenListFromMlf( detectedURI, whichLevel=2 ):
     ####################### 
     # # prepare list of phrases/phonemes from DETECTED:
     if whichLevel == tierAliases.phonemeLevel:
-        detectedWordList= mlf2PhonemesAndTsList(detectedURI)
+        detectedTokenList= mlf2PhonemesAndTsList(detectedURI)
     elif whichLevel == tierAliases.wordLevel or whichLevel == tierAliases.phraseLevel :
-        detectedWordList= mlf2WordAndTsList(detectedURI)
-    return detectedWordList
+        detectedTokenList= mlf2WordAndTsList(detectedURI)
+    else:
+        sys.exit("level could be only phoneme- or word-level")
+    return detectedTokenList
         
 
 

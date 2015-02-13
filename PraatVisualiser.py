@@ -43,23 +43,23 @@ def prepareOutputForPraat(outputHTKPhoneAlignedURI, wordAlignedSuffix, phonemeAl
         
         
         baseNameAudioFile = os.path.splitext(outputHTKPhoneAlignedURI)[0]
-        wordAlignedfileName=  mlf2TabFormat(listTsAndWords, baseNameAudioFile, wordAlignedSuffix)
+        wordAlignedfileName=  tokenList2TabFile(listTsAndWords, baseNameAudioFile, wordAlignedSuffix)
     
       
     ########################## same for phoneme-level: 
         
         # with : phoneme-level alignment
         listTsAndPhonemes = mlf2PhonemesAndTsList (outputHTKPhoneAlignedURI)
-        phonemeAlignedfileName=  mlf2TabFormat(listTsAndPhonemes, baseNameAudioFile, phonemeAlignedSuffix)
+        phonemeAlignedfileName=  tokenList2TabFile(listTsAndPhonemes, baseNameAudioFile, phonemeAlignedSuffix)
         
         
         
         return wordAlignedfileName, phonemeAlignedfileName
 
 
-def mlf2TabFormat( listTsAndPhonemes,  baseNameAudioFile, whichSuffix):
+def tokenList2TabFile( listTsAndPhonemes,  baseNameAudioFile, whichSuffix):
     '''
-    convenience method
+    convenience method. 
     '''
     
     # timeshift
@@ -82,7 +82,7 @@ def addAlignmentResultToTextGrid(detectedTokenList,  grTruthAnnoURI, tokenAligne
     instead of file with outputHTKPhoneAlignedURI use python list: @param detectedTokenList
     '''
     baseNameAudioFile = os.path.splitext(grTruthAnnoURI)[0]
-    tokenAlignedfileName=  mlf2TabFormat(detectedTokenList, baseNameAudioFile, tokenAlignedSuffix)
+    tokenAlignedfileName=  tokenList2TabFile(detectedTokenList, baseNameAudioFile, tokenAlignedSuffix)
     
     alignedResultPath, fileNameWordAnno = _alignmentResult2TextGrid(grTruthAnnoURI, tokenAlignedfileName)  
     return alignedResultPath, fileNameWordAnno               

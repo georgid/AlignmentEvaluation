@@ -20,9 +20,11 @@ Algorithm is token-identities-agnostic, e.g. it does not try to match token-IDs 
 
 Note that if a single boundary is detected between two tokens it is considered once as end of preceding annotation token  and beginning of following annotation token, which makes the metric rather strict
 
+------------------------------
 As well there is a module to convert automatically the decoded result to Praat's TextGrid format.
 This enables the  visualization of the decoding result together with the groundTruth in Praat:
 see PraatVisualiser.openTextGridInPraatopenTextGridInPraat : opens the text Grid in Praat
+NOTE: # deprecated due to error on opening word-level files... use instead tab2TextGrid 
 
 Enjoy!
  
