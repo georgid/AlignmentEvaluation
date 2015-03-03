@@ -120,6 +120,8 @@ def loadDetectedTokenListFromMlf( detectedURI, whichLevel=2 ):
 
 
 
+
+
 def _evalAlignmentError(annotationURI, detectedTokenList, whichLevel=2 ):
     '''
 Calculate alignment errors. Does not check token identities, but proceeds successively one-by-one  
@@ -138,25 +140,7 @@ TODO: eval performance of end timest. only and compare with begin ts.
     alignmentErrors = []
     
         ######################  
-    # prepare list of detected tokens. remove detected tokens NOISE, sil, sp entries from  detectedTokenList
-    detectedTokenListNoPauses = []   #result 
-    for detectedTsAndToken in detectedTokenList:
-        if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE' \
-            and detectedTsAndToken[2] != '_SAZ_' :
-            detectedTokenListNoPauses.append(detectedTsAndToken)
-
-    ######################  
-    # prepare list of phrases from ANNOTATION. remove empy annotaion tokens 
-    
-    try:
-        annotationTokenListA = TextGrid2WordList(annotationURI, whichLevel)
-    except Exception, errorMsg:
-        sys.exit(str(errorMsg))     
-    
-    annotationTokenListNoPauses = []
-    for currAnnoTsAndToken in annotationTokenListA:
-        if currAnnoTsAndToken[2] != "" and not(currAnnoTsAndToken[2].isspace()): # skip empty phrases
-                annotationTokenListNoPauses.append(currAnnoTsAndToken)
+    annotationTokenListNoPauses, detectedTokenListNoPauses, dummy, dummy = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel)
     
     if len(annotationTokenListNoPauses) == 0:
         logging.warn(annotationURI + ' is empty!')
@@ -164,7 +148,7 @@ TODO: eval performance of end timest. only and compare with begin ts.
     
     
     if len(detectedTokenListNoPauses) == 0:
-        logging.warn(' detected wotd list is empty!')
+        logging.warn(' detected token list is empty!')
         return alignmentErrors
     
     # loop in tokens of gr truth annotation
@@ -196,6 +180,36 @@ TODO: eval performance of end timest. only and compare with begin ts.
 
                 
     return  alignmentErrors
+
+
+
+'''
+prepare list of tokens. remove detected tokens NOISE, sil, sp entries from  detectedTokenList and annoTokenList
+
+'''
+def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel):
+    detectedTokenListNoPauses = [] #result
+    for detectedTsAndToken in detectedTokenList:
+        if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE' and detectedTsAndToken[2] != '_SAZ_':
+            detectedTokenListNoPauses.append(detectedTsAndToken)
+    
+######################
+# prepare list of phrases from ANNOTATION. remove empy annotaion tokens
+    try:
+        annotationTokenListA = TextGrid2WordList(annotationURI, whichLevel)
+    except Exception as errorMsg:
+        sys.exit(str(errorMsg))
+    
+    
+    
+    annotationTokenListNoPauses = []
+    
+    for currAnnoTsAndToken in annotationTokenListA:
+        if currAnnoTsAndToken[2] != "" and not (currAnnoTsAndToken[2].isspace()): # skip empty phrases
+            annotationTokenListNoPauses.append(currAnnoTsAndToken)
+    
+    return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), detectedTokenList[-1][1]
+
 
 
 def calcErrorBeginAndEndTs(detectedTokenListNoPauses, annoTsAndToken, currentWordNumber, numWordsInPhrase):
@@ -314,8 +328,7 @@ if __name__ == '__main__':
 
     detectedList =    [ [0.386834650351, 0.996834650351,    '_SAZ_'],
                      [0.996834650351,3.17683465035,    u'Bakmıyor'],
-                      [3.17683465035,3.82683465035,  u'çeşm'],
-                      [3.82683465035,4.44683465035,    'i'],
+                      [3.17683465035,4.44683465035,  u'çeşmi'],
                       [4.44683465035,6.02683465035,    'siyah'],
                       [6.02683465035,11.5068346504,    u'feryâde']]
     
