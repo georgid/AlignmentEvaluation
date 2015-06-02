@@ -71,7 +71,8 @@ TODO: eval performance of end timest. only and compare with begin ts.
             sys.exit('token (phrase) with no subtokens (words) in annotation file!')
         
         if  currentWordNumber >= len(detectedTokenListNoPauses):
-            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( currentWordNumber, len(detectedTokenListNoPauses)))
+            from pip._vendor.html5lib.serializer.htmlserializer import len
+            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( len(annotationTokenListNoPauses), len(detectedTokenListNoPauses)))
             
         
         durationCorrect += calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, idx, currentWordNumber, numWordsInPhrase,  finalTsAnno, finalTsDetected)        

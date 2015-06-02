@@ -9,7 +9,7 @@ sys.path.append(os.path.realpath('../Batch_Processing/'))
 
       
 
-tier_names = ["phonemes", 'words', "phrases" ];
+tier_names = ["phonemes", 'words', "phrases", "lyrics-syllables-pinyin", 'sections'];
 
 '''
 textGrid to dictionary column file 

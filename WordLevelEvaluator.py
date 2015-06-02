@@ -17,7 +17,7 @@ import logging
 
 
 # this allows path to packages to be resolved correctly (on import) from outside of eclipse 
-parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(sys.argv[0]) ), os.path.pardir)) 
+parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir)) 
 sys.path.append(parentDir)
 
 # utilsLyrics
@@ -26,7 +26,7 @@ sys.path.append(pathUtils )
 
 
 from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tier_names
-from Utilz import getMeanAndStDevError
+from Utilz import getMeanAndStDevError, writeListOfListToTextFile
 
 
 ANNOTATION_EXT = '.TextGrid'
@@ -41,11 +41,12 @@ class Enumerate(object):
     for number, name in enumerate(names.split()):
       setattr(self, name, number)
 
-tierAliases = Enumerate("phonemeLevel wordLevel phraseLevel")
+tierAliases = Enumerate("phonemeLevel wordLevel phraseLevel lyrics-syllables-pinyin sections")
 
 
 def determineSuffix(withDuration, withSynthesis, evalLevel):
     '''
+    
     lookup suffix for result files  depending on which algorithm used
     '''    
     evalLevelToken = tier_names[evalLevel]
@@ -193,22 +194,47 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel):
         if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE' and detectedTsAndToken[2] != '_SAZ_':
             detectedTokenListNoPauses.append(detectedTsAndToken)
     
-######################
-# prepare list of phrases from ANNOTATION. remove empy annotaion tokens
+    annotationTokenListA, annotationTokenListNoPauses =  readNonEmptyTokensTextGrid(annotationURI, whichLevel)
+    
+    return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), detectedTokenList[-1][1]
+
+
+def readNonEmptyTokensTextGrid(annotationURI, whichLevel, initialTimeOffset=0):
+    '''
+        ######################
+    # prepare list of phrases from ANNOTATION. remove empy annotaion tokens
+    '''
     try:
         annotationTokenListA = TextGrid2WordList(annotationURI, whichLevel)
     except Exception as errorMsg:
         sys.exit(str(errorMsg))
     
+    for currAnnoTsAndToken in annotationTokenListA:
+        currAnnoTsAndToken[0] = float(currAnnoTsAndToken[0])
+        currAnnoTsAndToken[0] += initialTimeOffset
+        currAnnoTsAndToken[1] = float(currAnnoTsAndToken[1])
+        currAnnoTsAndToken[1] += initialTimeOffset
+
+    
+    # store to file .anno
+    baseN = os.path.basename(annotationURI)
+    dir = os.path.dirname(annotationURI)
+    annotationURI_anno = os.path.join(dir,baseN+'.anno')
     
     
+    writeListOfListToTextFile(annotationTokenListA, None,   annotationURI_anno )
+
     annotationTokenListNoPauses = []
     
+    #########
+    # remove empty phrases
     for currAnnoTsAndToken in annotationTokenListA:
         if currAnnoTsAndToken[2] != "" and not (currAnnoTsAndToken[2].isspace()): # skip empty phrases
             annotationTokenListNoPauses.append(currAnnoTsAndToken)
+
     
-    return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), detectedTokenList[-1][1]
+    return annotationTokenListA, annotationTokenListNoPauses
+
 
 
 
