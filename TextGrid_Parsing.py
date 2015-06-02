@@ -35,10 +35,10 @@ def TextGrid2Dict(textgrid_file, outputFileName):
 	outputFileHandle.close()		
 
 
-def TextGrid2WordList(textgrid_file, whichLevel=2):
+def TextGrid2WordList(textgrid_file, whichTier=2):
     '''
     parse textGrid into a python list of tokens 
-    @param whichLevel : 0 -  phonemes,    1- words, 2 - phrases  
+    @param whichTier : 0 -  phonemes,    1- words, 2 - phrases  
     '''	
     if not os.path.isfile(textgrid_file): raise Exception("file {} not found".format(textgrid_file))
     beginTsAndWordList=[]
@@ -49,14 +49,14 @@ def TextGrid2WordList(textgrid_file, whichLevel=2):
     isTierFound = 0
     for tier in tiers:
         tierName= tier.tier_name().replace('.','')
-        if tierName == tier_names[int(whichLevel)]:	#iterating over tiers and selecting the one specified
+        if tierName == tier_names[int(whichTier)]:	#iterating over tiers and selecting the one specified
 			isTierFound = 1
 			tier_details = tier.make_simple_transcript();		#this function parse the file nicely and return cool tuples
 			
 			for line in tier_details:
 				beginTsAndWordList.append([line[0], line[1], line[2]])
     if not isTierFound:
-		raise Exception('tier in file {0} might not be named correctly. Name it {1}' .format(textgrid_file, tier_names[whichLevel]))
+		raise Exception('tier in file {0} might not be named correctly. Name it {1}' .format(textgrid_file, tier_names[whichTier]))
     return beginTsAndWordList		
 
 

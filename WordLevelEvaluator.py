@@ -118,24 +118,12 @@ def loadDetectedTokenListFromMlf( detectedURI, whichLevel=2 ):
 
 
 
-
-
-
-
-
 def _evalAlignmentError(annotationURI, detectedTokenList, whichLevel=2 ):
     '''
 Calculate alignment errors. Does not check token identities, but proceeds successively one-by-one  
 Make sure number of detected tokens (wihtout counting sp, sil ) is same as number of annotated tokens 
 
-    @param detectedURI: a list of triples: (startTs, endTs, wordID) 
-    @param annotationURI: URI of Praat annotaiton textgrid. 
-    @param whichLevel, 0- phonemeLevel, 1 -wordLevel,  2 - phraseLevel. The level at which to compare phrases 
-    reads only the layer from with name correspondingly phonemes, words or phrases
-    
-    token: could be phoneme (consists of one subtoken -phoneme itself), word (consists of one subtoken -word itself) or phrase (consist of subtokens words ) 
-
-TODO: eval performance of end timest. only and compare with begin ts. 
+for description see related method: AccuracyEvaluator._evalAccuracy
 
     '''
     alignmentErrors = []
@@ -177,8 +165,7 @@ TODO: eval performance of end timest. only and compare with begin ts.
     
     # sanity check: 
     if currentWordNumber != len(detectedTokenListNoPauses):
-            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( currentWordNumber, len(detectedTokenListNoPauses)))
-
+            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( len(annotationTokenListNoPauses), len(detectedTokenListNoPauses)))
                 
     return  alignmentErrors
 

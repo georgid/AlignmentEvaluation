@@ -16,23 +16,22 @@ pathUtils = os.path.join(parentDir, 'utilsLyrics')
 sys.path.append(pathUtils )
 from Utilz import  readListOfListTextFile
 
-def evalAccuracy(URIrecordingAnno, outputHTKPhoneAlignedURI, whichLevel=2 ):
+def evalAccuracy(URIrecordingAnno, outputHTKPhoneAlignedURI, whichTier=2 ):
     
-    detectedTokenList = loadDetectedTokenListFromMlf( outputHTKPhoneAlignedURI, whichLevel )
-    durationCorrect, totalDuration = _evalAccuracy(URIrecordingAnno, detectedTokenList, whichLevel)
+    detectedTokenList = loadDetectedTokenListFromMlf( outputHTKPhoneAlignedURI, whichTier )
+    durationCorrect, totalDuration = _evalAccuracy(URIrecordingAnno, detectedTokenList, whichTier)
     return  durationCorrect, totalDuration 
 
-def _evalAccuracy(annotationURI, detectedTokenList, whichLevel=2 ):
+def _evalAccuracy(annotationURI, detectedTokenList, whichTier=2 ):
     '''
 Calculate accuracy as suggested in
-Fujihara paper
+Fujihara: LyricSynchronizer: Automatic Synchronization System Between Musical Audio Signals and Lyrics
 Does not check token identities, but proceeds successively one-by-one  
 Make sure number of detected tokens (wihtout counting sp, sil ) is same as number of annotated tokens 
 
     @param detectedURI: a list of triples: (startTs, endTs, wordID) 
     @param annotationURI: URI of Praat annotaiton textgrid. 
-    @param whichLevel, 0- phonemeLevel, 1 -wordLevel,  2 - phraseLevel. The level at which to compare phrases 
-    reads only the layer from with name correspondingly phonemes, words or phrases
+    @param whichTier works only with the tier from TextGrid_Parsing  tier_names = ["phonemes", 'words', "phrases", "lyrics-syllables-pinyin", 'sections'];
     
     token: could be phoneme (consists of one subtoken -phoneme itself), word (consists of one subtoken -word itself) or phrase (consist of subtokens words ) 
 
@@ -41,7 +40,7 @@ TODO: eval performance of end timest. only and compare with begin ts.
     '''
     
         ######################  
-    annotationTokenListNoPauses, detectedTokenListNoPauses, finalTsAnno, finalTsDetected = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel)
+    annotationTokenListNoPauses, detectedTokenListNoPauses, finalTsAnno, finalTsDetected = stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier)
     
     # WoRKAROUND. because currenty I dont store final sil in textFile .*Aligned 
     finalTsDetected = finalTsAnno
@@ -83,7 +82,7 @@ TODO: eval performance of end timest. only and compare with begin ts.
     
     # sanity check: 
     if currentWordNumber != len(detectedTokenListNoPauses):
-            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( currentWordNumber, len(detectedTokenListNoPauses)))
+            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( len(annotationTokenListNoPauses), len(detectedTokenListNoPauses) ) )
 
     totalLength = max(float(finalTsAnno), float(finalTsDetected)   )              
     return  durationCorrect, totalLength 
@@ -122,6 +121,7 @@ def calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, idx, cur
 
 if __name__ == '__main__':
 
+######### for test logic see WordLevelEvaluator instead
 
     PATH_TEST_DATASET = 'example/'
       
@@ -133,5 +133,5 @@ if __name__ == '__main__':
 
     
     
-    durationCorrect, totalLength  = _evalAccuracy(annotationURI, detectedTokenList, whichLevel=2 )
+    durationCorrect, totalLength  = _evalAccuracy(annotationURI, detectedTokenList, whichTier=2 )
     print durationCorrect / totalLength
