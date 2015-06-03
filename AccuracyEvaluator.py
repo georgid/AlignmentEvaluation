@@ -22,7 +22,7 @@ def evalAccuracy(URIrecordingAnno, outputHTKPhoneAlignedURI, whichTier=2 ):
     durationCorrect, totalDuration = _evalAccuracy(URIrecordingAnno, detectedTokenList, whichTier)
     return  durationCorrect, totalDuration 
 
-def _evalAccuracy(annotationURI, detectedTokenList, whichTier=2 ):
+def _evalAccuracy(annotationURI, detectedTokenList, whichTier, startIdx, endIdx):
     '''
 Calculate accuracy as suggested in
 Fujihara: LyricSynchronizer: Automatic Synchronization System Between Musical Audio Signals and Lyrics
@@ -40,7 +40,7 @@ TODO: eval performance of end timest. only and compare with begin ts.
     '''
     
         ######################  
-    annotationTokenListNoPauses, detectedTokenListNoPauses, finalTsAnno, finalTsDetected = stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier)
+    annotationTokenListNoPauses, detectedTokenListNoPauses, finalTsAnno, finalTsDetected = stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx)
     
     # WoRKAROUND. because currenty I dont store final sil in textFile .*Aligned 
     finalTsDetected = finalTsAnno
@@ -133,5 +133,5 @@ if __name__ == '__main__':
 
     
     
-    durationCorrect, totalLength  = _evalAccuracy(annotationURI, detectedTokenList, whichTier=2 )
+    durationCorrect, totalLength  = _evalAccuracy(annotationURI, detectedTokenList, whichTier=2, startIdx=0, endIdx=6)
     print durationCorrect / totalLength
