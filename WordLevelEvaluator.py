@@ -118,7 +118,7 @@ def loadDetectedTokenListFromMlf( detectedURI, whichLevel=2 ):
 
 
 
-def _evalAlignmentError(annotationURI, detectedTokenList, whichLevel=2 ):
+def _evalAlignmentError(annotationURI, detectedTokenList, whichLevel, startIdx, endIdx):
     '''
 Calculate alignment errors. Does not check token identities, but proceeds successively one-by-one  
 Make sure number of detected tokens (wihtout counting sp, sil ) is same as number of annotated tokens 
@@ -129,7 +129,7 @@ for description see related method: AccuracyEvaluator._evalAccuracy
     alignmentErrors = []
     
         ######################  
-    annotationTokenListNoPauses, detectedTokenListNoPauses, dummy, dummy = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel)
+    annotationTokenListNoPauses, detectedTokenListNoPauses, dummy, dummy = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx, endIdx)
     
     if len(annotationTokenListNoPauses) == 0:
         logging.warn(annotationURI + ' is empty!')
@@ -175,18 +175,27 @@ for description see related method: AccuracyEvaluator._evalAccuracy
 prepare list of tokens. remove detected tokens NOISE, sil, sp entries from  detectedTokenList and annoTokenList
 
 '''
-def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel):
+def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx, endIdx):
+    annotationTokenListA, annotationTokenListNoPauses =  readNonEmptyTokensTextGrid(annotationURI, whichLevel, startIdx, endIdx)
+
+    # detected token starts from time 0. Time offset needs to be added.
+    initialTimeOffset = annotationTokenListA[0][0]
+    for currDetectedTsAndToken in detectedTokenList:
+        currDetectedTsAndToken[0] = float(currDetectedTsAndToken[0])
+        currDetectedTsAndToken[0] += initialTimeOffset
+        currDetectedTsAndToken[1] = float(currDetectedTsAndToken[1])
+        currDetectedTsAndToken[1] += initialTimeOffset
+
     detectedTokenListNoPauses = [] #result
     for detectedTsAndToken in detectedTokenList:
         if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE' and detectedTsAndToken[2] != '_SAZ_':
             detectedTokenListNoPauses.append(detectedTsAndToken)
     
-    annotationTokenListA, annotationTokenListNoPauses =  readNonEmptyTokensTextGrid(annotationURI, whichLevel)
-    
     return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), detectedTokenList[-1][1]
 
 
-def readNonEmptyTokensTextGrid(annotationURI, whichLevel, initialTimeOffset=0):
+# def readNonEmptyTokensTextGrid(annotationURI, whichLevel, initialTimeOffset=0, startIdx, endIdx):
+def readNonEmptyTokensTextGrid(annotationURI, whichLevel, startIdx, endIdx):
     '''
         ######################
     # prepare list of phrases from ANNOTATION. remove empy annotaion tokens
@@ -195,12 +204,14 @@ def readNonEmptyTokensTextGrid(annotationURI, whichLevel, initialTimeOffset=0):
         annotationTokenListA = TextGrid2WordList(annotationURI, whichLevel)
     except Exception as errorMsg:
         sys.exit(str(errorMsg))
+
+    annotationTokenListA = annotationTokenListA[startIdx : endIdx]
     
     for currAnnoTsAndToken in annotationTokenListA:
         currAnnoTsAndToken[0] = float(currAnnoTsAndToken[0])
-        currAnnoTsAndToken[0] += initialTimeOffset
+        # currAnnoTsAndToken[0] += initialTimeOffset
         currAnnoTsAndToken[1] = float(currAnnoTsAndToken[1])
-        currAnnoTsAndToken[1] += initialTimeOffset
+        # currAnnoTsAndToken[1] += initialTimeOffset
 
     
     # store to file .anno
@@ -219,7 +230,6 @@ def readNonEmptyTokensTextGrid(annotationURI, whichLevel, initialTimeOffset=0):
         if currAnnoTsAndToken[2] != "" and not (currAnnoTsAndToken[2].isspace()): # skip empty phrases
             annotationTokenListNoPauses.append(currAnnoTsAndToken)
 
-    
     return annotationTokenListA, annotationTokenListNoPauses
 
 
@@ -331,7 +341,8 @@ if __name__ == '__main__':
  ############### 3  other example with detected tsv file
     PATH_TEST_DATASET = 'example/'
       
-    audioName = '01_Bakmiyor_0_zemin'
+    #audioName = '01_Bakmiyor_0_zemin'
+    audioName = 'test'
     annotationURI = os.path.join(PATH_TEST_DATASET,  audioName + ANNOTATION_EXT)
     
     # TODO: load from file
@@ -344,8 +355,9 @@ if __name__ == '__main__':
                       [3.17683465035,4.44683465035,  u'çeşmi'],
                       [4.44683465035,6.02683465035,    'siyah'],
                       [6.02683465035,11.5068346504,    u'feryâde']]
-    
-    alignmentErrors = _evalAlignmentError(annotationURI, detectedList, tierAliases.phraseLevel)
+
+    # Idx starts from 0 following python indexing.
+    alignmentErrors = _evalAlignmentError(annotationURI, detectedList, tierAliases.phraseLevel, startIdx=0, endIdx=7)
     mean, stDev, median = getMeanAndStDevError(alignmentErrors)
         
     print  mean, " ", stDev
