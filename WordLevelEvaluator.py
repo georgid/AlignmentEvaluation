@@ -129,7 +129,7 @@ for description see related method: AccuracyEvaluator._evalAccuracy
     alignmentErrors = []
     
         ######################  
-    annotationTokenListNoPauses, detectedTokenListNoPauses, dummy, dummy = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx, endIdx)
+    annotationTokenListNoPauses, detectedTokenListNoPauses, dummy, dummy, dummyInitialiTimeOffset = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx, endIdx)
     
     if len(annotationTokenListNoPauses) == 0:
         logging.warn(annotationURI + ' is empty!')
@@ -188,26 +188,31 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx,
 
     detectedTokenListNoPauses = [] #result
     for detectedTsAndToken in detectedTokenList:
-        if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE' and detectedTsAndToken[2] != '_SAZ_':
+        if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE' and detectedTsAndToken[2] != '_SAZ_' and detectedTsAndToken[2] != 'REST':
             detectedTokenListNoPauses.append(detectedTsAndToken)
     
-    return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), detectedTokenList[-1][1]
+    for token in annotationTokenListNoPauses:
+        token = token[0]
+    return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), detectedTokenList[-1][1], initialTimeOffset
 
 
 # def readNonEmptyTokensTextGrid(annotationURI, whichLevel, initialTimeOffset=0, startIdx, endIdx):
 def readNonEmptyTokensTextGrid(annotationURI, whichLevel, startIdx, endIdx):
     '''
         ######################
-    # prepare list of phrases from ANNOTATION. remove empy annotaion tokens
+    # prepare list of phrases from ANNOTATION. remove empty annotation tokens
+    @param endIdx: set endIdx to be -1 if all tokens wanted
+    @return: annotationTokenListNoPauses - list of tuples (index from original list of tokens, token with lyrics)
     '''
     try:
-        annotationTokenListA = TextGrid2WordList(annotationURI, whichLevel)
+        annotationTokenListAll = TextGrid2WordList(annotationURI, whichLevel)
     except Exception as errorMsg:
         sys.exit(str(errorMsg))
-
-    annotationTokenListA = annotationTokenListA[startIdx : endIdx]
     
-    for currAnnoTsAndToken in annotationTokenListA:
+    if endIdx != -1:
+        annotationTokenListAll = annotationTokenListAll[startIdx : endIdx+1]
+    
+    for currAnnoTsAndToken in annotationTokenListAll:
         currAnnoTsAndToken[0] = float(currAnnoTsAndToken[0])
         # currAnnoTsAndToken[0] += initialTimeOffset
         currAnnoTsAndToken[1] = float(currAnnoTsAndToken[1])
@@ -220,17 +225,19 @@ def readNonEmptyTokensTextGrid(annotationURI, whichLevel, startIdx, endIdx):
     annotationURI_anno = os.path.join(dir,baseN+'.anno')
     
     
-    writeListOfListToTextFile(annotationTokenListA, None,   annotationURI_anno )
+    writeListOfListToTextFile(annotationTokenListAll, None,   annotationURI_anno )
 
     annotationTokenListNoPauses = []
     
     #########
     # remove empty phrases
-    for currAnnoTsAndToken in annotationTokenListA:
+
+    for idxListAll,currAnnoTsAndToken in enumerate(annotationTokenListAll):
         if currAnnoTsAndToken[2] != "" and not (currAnnoTsAndToken[2].isspace()): # skip empty phrases
+            currAnnoTsAndToken.append(idxListAll) # add index to list of all tokens
             annotationTokenListNoPauses.append(currAnnoTsAndToken)
 
-    return annotationTokenListA, annotationTokenListNoPauses
+    return annotationTokenListAll, annotationTokenListNoPauses
 
 
 

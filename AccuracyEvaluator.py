@@ -29,9 +29,11 @@ Fujihara: LyricSynchronizer: Automatic Synchronization System Between Musical Au
 Does not check token identities, but proceeds successively one-by-one  
 Make sure number of detected tokens (wihtout counting sp, sil ) is same as number of annotated tokens 
 
-    @param detectedURI: a list of triples: (startTs, endTs, wordID) 
+    @param detectedTokenList: a list of triples: (startTs, endTs, wordID) 
     @param annotationURI: URI of Praat annotaiton textgrid. 
     @param whichTier works only with the tier from TextGrid_Parsing  tier_names = ["phonemes", 'words', "phrases", "lyrics-syllables-pinyin", 'sections'];
+    @param startIdx index of boundary in tier to be considered as start one  (from TextGrid -1 )
+    @param endIdx index of end token
     
     token: could be phoneme (consists of one subtoken -phoneme itself), word (consists of one subtoken -word itself) or phrase (consist of subtokens words ) 
 
@@ -40,10 +42,10 @@ TODO: eval performance of end timest. only and compare with begin ts.
     '''
     
         ######################  
-    annotationTokenListNoPauses, detectedTokenListNoPauses, finalTsAnno, finalTsDetected = stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx)
+    annotationTokenListNoPauses, detectedTokenListNoPauses, finalTsAnno, finalTsDetected, initialTimeOffset = stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx)
     
-    # WoRKAROUND. because currenty I dont store final sil in textFile .*Aligned 
-    finalTsDetected = finalTsAnno
+    # WoRKAROUND. because currenty I dont store final sil in detected textFile .*Aligned 
+#     finalTsDetected = finalTsAnno
 
     durationCorrect = 0;
 
@@ -57,7 +59,7 @@ TODO: eval performance of end timest. only and compare with begin ts.
         return durationCorrect
     
     # loop in tokens of gr truth annotation
-    durationCorrect = min(float(annotationTokenListNoPauses[0][0]), detectedTokenListNoPauses[0][0])
+    durationCorrect = min(float(annotationTokenListNoPauses[0][0]), detectedTokenListNoPauses[0][0]) - initialTimeOffset
     
     currentWordNumber = 0
     for idx, currAnnoTsAndToken in enumerate(annotationTokenListNoPauses):
@@ -70,7 +72,6 @@ TODO: eval performance of end timest. only and compare with begin ts.
             sys.exit('token (phrase) with no subtokens (words) in annotation file!')
         
         if  currentWordNumber >= len(detectedTokenListNoPauses):
-            from pip._vendor.html5lib.serializer.htmlserializer import len
             sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( len(annotationTokenListNoPauses), len(detectedTokenListNoPauses)))
             
         
@@ -84,7 +85,7 @@ TODO: eval performance of end timest. only and compare with begin ts.
     if currentWordNumber != len(detectedTokenListNoPauses):
             sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( len(annotationTokenListNoPauses), len(detectedTokenListNoPauses) ) )
 
-    totalLength = max(float(finalTsAnno), float(finalTsDetected)   )              
+    totalLength = max(float(finalTsAnno), float(finalTsDetected)   )       -       initialTimeOffset
     return  durationCorrect, totalLength 
 
 
@@ -103,35 +104,19 @@ def calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, idx, cur
         nextBeginAnno = float(annotationTokenListNoPauses[idx+1][0])
         
         if currentWordNumber + numWordsInPhrase > len(detectedTokenListNoPauses) -1 :
-            sys.exit("Error in avaluation. to do implement")
+            sys.exit("length of list of deteceted tokens = {} differes from len of tokens in annotation {}".format(len(detectedTokenListNoPauses),currentWordNumber + numWordsInPhrase ))
         nextBeginDetected = detectedTokenListNoPauses[currentWordNumber + numWordsInPhrase][0]
         correct += max(0,min(nextBeginAnno,nextBeginDetected) - max(currEndAnno, currEndDetected))
     else:
         if (currEndAnno > finalTsDetected):  
-            sys.exit("currEndAnno > finalTsDetected")
+            pass
+#             sys.exit("currEndAnno > finalTsDetected")
         if (currEndDetected > finallTsAnno ):
             # WORKAROUND
+            logging.warn("currEndDetected {} > finallTsAnno {}".format(currEndDetected, finallTsAnno))
             currEndDetected = finallTsAnno
-            logging.warn("currEndDetected > finallTsAnno")
         
         correct += max(0,min(finallTsAnno,finalTsDetected) - max(currEndAnno, currEndDetected))
         
     return correct
 
-
-if __name__ == '__main__':
-
-######### for test logic see WordLevelEvaluator instead
-
-    PATH_TEST_DATASET = 'example/'
-      
-    annotationURI = os.path.join(PATH_TEST_DATASET,  'grTruth.TextGrid')
-    
-    #  load from file
-#     detectedURI = os.path.join(PATH_TEST_DATASET,  audioName +  '.phrasesDurationAligned')
-    detectedTokenList = readListOfListTextFile(os.path.join(PATH_TEST_DATASET,  'detected.aligned'))
-
-    
-    
-    durationCorrect, totalLength  = _evalAccuracy(annotationURI, detectedTokenList, whichTier=2, startIdx=0, endIdx=6)
-    print durationCorrect / totalLength

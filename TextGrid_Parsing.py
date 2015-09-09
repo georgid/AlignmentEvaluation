@@ -65,5 +65,7 @@ def TextGrid2WordList(textgrid_file, whichTier=2):
 
 
 if __name__ == '__main__':
-	
-	TextGrid2Dict(sys.argv[1], sys.argv[2])
+# 	TextGrid2Dict(sys.argv[1], sys.argv[2])
+    annotationURI = 'example/01_Bakmiyor_0_zemin.TextGrid'
+    whichTier = 2 # phrases
+    annotationTokenListA = TextGrid2WordList(annotationURI, whichTier)
