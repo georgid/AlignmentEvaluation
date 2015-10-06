@@ -3,13 +3,14 @@
 import textgrid as tgp
 import sys, os
 
+import WordLevelEvaluator
+
 sys.path.append(os.path.realpath('../Batch_Processing/'))
 # import Batch_Proc_Essentia as BP  # @UnresolvedImport
 
 
       
 
-tier_names = ["phonemes", 'words', "phrases", "lyrics-syllables-pinyin", 'sections'];
 
 '''
 textGrid to dictionary column file 
@@ -18,13 +19,13 @@ def TextGrid2Dict(textgrid_file, outputFileName):
 	
 	par_obj = tgp.TextGrid.load(textgrid_file)	#loading the object	
 	tiers= tgp.TextGrid._find_tiers(par_obj)	#finding existing tiers
-		
+    
 	outputFileHandle = open(outputFileName, 'w')
 	
 	
 	for tier in tiers:
 		
-		if tier.tier_name() == tier_names[2]:	#iterating over tiers and selecting the one specified
+		if tier.tier_name() == WordLevelEvaluator.tier_names[2]:	#iterating over tiers and selecting the one specified
 			
 			tier_details = tier.make_simple_transcript();		#this function parse the file nicely and return cool tuples
 			
@@ -49,23 +50,20 @@ def TextGrid2WordList(textgrid_file, whichTier=2):
     isTierFound = 0
     for tier in tiers:
         tierName= tier.tier_name().replace('.','')
-        if tierName == tier_names[int(whichTier)]:	#iterating over tiers and selecting the one specified
+        if tierName ==  WordLevelEvaluator.tier_names[int(whichTier)]:	#iterating over tiers and selecting the one specified
 			isTierFound = 1
 			tier_details = tier.make_simple_transcript();		#this function parse the file nicely and return cool tuples
 			
 			for line in tier_details:
-				beginTsAndWordList.append([line[0], line[1], line[2]])
+				beginTsAndWordList.append([float(line[0]), float(line[1]), line[2]])
     if not isTierFound:
-		raise Exception('tier in file {0} might not be named correctly. Name it {1}' .format(textgrid_file, tier_names[whichTier]))
+		raise Exception('tier in file {0} might not be named correctly. Name it {1}' .format(textgrid_file,  WordLevelEvaluator.tier_names[whichTier]))
     return beginTsAndWordList		
 
 
 ##################################################################################
 
-
-
-if __name__ == '__main__':
-# 	TextGrid2Dict(sys.argv[1], sys.argv[2])
-    annotationURI = 'example/01_Bakmiyor_0_zemin.TextGrid'
-    whichTier = 2 # phrases
-    annotationTokenListA = TextGrid2WordList(annotationURI, whichTier)
+def toChronTest(textgrid_file):
+    par_obj = tgp.TextGrid.load(textgrid_file)    #loading the object    
+    chronFile = tgp.TextGrid.to_chron(par_obj)
+    print chronFile

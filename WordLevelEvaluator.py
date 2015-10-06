@@ -25,7 +25,7 @@ pathUtils = os.path.join(parentDir,  'utilsLyrics')
 sys.path.append(pathUtils )
 
 
-from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tier_names
+from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList
 from Utilz import getMeanAndStDevError, writeListOfListToTextFile
 
 
@@ -41,7 +41,12 @@ class Enumerate(object):
     for number, name in enumerate(names.split()):
       setattr(self, name, number)
 
-tierAliases = Enumerate("phonemeLevel wordLevel phraseLevel lyrics-syllables-pinyin sections")
+# tierAliases = Enumerate("phonemeLevel wordLevel phraseLevel lyrics-syllables-pinyin sections")
+tierAliases = Enumerate("phonemes words phrases pinyin sections line details detailsgeorgi")
+tier_names = ["phonemes", "words", "phrases", "pinyin", "sections", "line", "details", "detailsgeorgi"];
+
+# tierAliases = Enumerate("phonemes words phrases pinyin sections line detailsgeorgi")
+# tier_names = ["phonemes", "words", "phrases", "pinyin", "sections", "line", "detailsgeorgi"];
 
 
 def determineSuffix(withDuration, withSynthesis, evalLevel):
@@ -107,9 +112,9 @@ def loadDetectedTokenListFromMlf( detectedURI, whichLevel=2 ):
 
     ####################### 
     # # prepare list of phrases/phonemes from DETECTED:
-    if whichLevel == tierAliases.phonemeLevel:
+    if whichLevel == tierAliases.phonemes:
         detectedTokenList= mlf2PhonemesAndTsList(detectedURI)
-    elif whichLevel == tierAliases.wordLevel or whichLevel == tierAliases.phraseLevel :
+    elif whichLevel == tierAliases.words or whichLevel == tierAliases.phrases :
         detectedTokenList= mlf2WordAndTsList(detectedURI)
     else:
         sys.exit("level could be only phoneme- or word-level")
@@ -199,9 +204,10 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx,
 # def readNonEmptyTokensTextGrid(annotationURI, whichLevel, initialTimeOffset=0, startIdx, endIdx):
 def readNonEmptyTokensTextGrid(annotationURI, whichLevel, startIdx, endIdx):
     '''
-        ######################
+    ######################
     # prepare list of phrases from ANNOTATION. remove empty annotation tokens
     @param endIdx: set endIdx to be -1 if all tokens wanted
+    
     @return: annotationTokenListNoPauses - list of tuples (index from original list of tokens, token with lyrics)
     '''
     try:
@@ -225,7 +231,7 @@ def readNonEmptyTokensTextGrid(annotationURI, whichLevel, startIdx, endIdx):
     annotationURI_anno = os.path.join(dir,baseN+'.anno')
     
     
-    writeListOfListToTextFile(annotationTokenListAll, None,   annotationURI_anno )
+#     writeListOfListToTextFile(annotationTokenListAll, None,   annotationURI_anno )
 
     annotationTokenListNoPauses = []
     
@@ -302,7 +308,12 @@ def evalOneFile(argv):
         
         return mean, stDev,  median, alignmentErrors
     
-             
+   
+            
+            
+        
+        
+        
    
 
 ##################################################################################
@@ -364,7 +375,7 @@ if __name__ == '__main__':
                       [6.02683465035,11.5068346504,    u'feryâde']]
 
     # Idx starts from 0 following python indexing.
-    alignmentErrors = _evalAlignmentError(annotationURI, detectedList, tierAliases.phraseLevel, startIdx=0, endIdx=7)
+    alignmentErrors = _evalAlignmentError(annotationURI, detectedList, tierAliases.phrases, startIdx=0, endIdx=7)
     mean, stDev, median = getMeanAndStDevError(alignmentErrors)
         
     print  mean, " ", stDev

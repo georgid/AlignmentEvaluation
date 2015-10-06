@@ -254,6 +254,7 @@ class TextGrid(object):
             chron_file += tier_header + "\n"
             transcript = tier.simple_transcript
             for (xmin, xmax, utt) in transcript:
+                chron_file += '\n! ' + tier.nameid + ':\n'
                 chron_file += str(idx) + " " + str(xmin) 
                 chron_file += " " + str(xmax) +"\n"
                 chron_file += "\"" + utt + "\"\n"
