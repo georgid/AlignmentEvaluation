@@ -3,7 +3,9 @@ Created on Jun 30, 2015
 
 @author: joro
 '''
-
+from WordLevelEvaluator import _evalAlignmentError, tierAliases
+from PraatVisualiser import ANNOTATION_EXT
+import os
 
 
 #     evalOneFile(sys.argv)
@@ -20,20 +22,36 @@ Created on Jun 30, 2015
 #     mean, stDev,  median, alignmentErrors  = evalOneFile([__file__, annotationURI, detectedURI, tierAliases.wordLevel, audioURI ])
 #      
     ############### 2  example with detected tsv file
-#     PATH_TEST_DATASET = 'example/'
-#       
-#     audioName = '05_Semahat_Ozdenses_-_Bir_Ihtimal_Daha_Var_0_zemin_from_69_5205_to_84_2'
-#     annotationURI = os.path.join(PATH_TEST_DATASET,  audioName + ANNOTATION_EXT)
-#     
-#     # TODO: load from file
-# #     detectedURI = os.path.join(PATH_TEST_DATASET,  audioName +  '.phrasesDurationAligned')
-#   
-#     detectedList =   [[0.61, 0.94, u'Bir'], [1.02, 3.41, u'ihtimal'], [3.42, 4.11, u'daha'], [4.12, 5.4, u'var'], [5.5, 7.93, '_SAZ_'], \
-#     [8.03, 8.42, u'o'], [8.46, 8.83, u'da'], [8.86, 10.65, u'\xf6lmek'], [10.66, 11.04, u'mi'], [11.05, 14.39, u'dersin']]
-#     
-#        
-#     alignmentErrors = _evalAlignmentError(annotationURI, detectedList, tierAliases.phraseLevel)
-#     mean, stDev, median = getMeanAndStDevError(alignmentErrors)
-#         
+
+def testOneFile():
+    PATH_TEST_DATASET = '../example/'
+       
+    audioName = '05_Semahat_Ozdenses_-_Bir_Ihtimal_Daha_Var_0_zemin_from_69_5205_to_84_2'
+    annotationURI = os.path.join(PATH_TEST_DATASET,  audioName + ANNOTATION_EXT)
+     
+    # TODO: load from file
+#     detectedURI = os.path.join(PATH_TEST_DATASET,  audioName +  '.phrasesDurationAligned')
+   
+    detectedList =   [[0.61, 0.94, u'Bir'], [1.02, 3.41, u'ihtimal'], [3.42, 4.11, u'daha'], [4.12, 5.4, u'var'], [5.5, 7.93, '_SAZ_'], \
+    [8.03, 8.42, u'o'], [8.46, 8.83, u'da'], [8.86, 10.65, u'\xf6lmek'], [10.66, 11.04, u'mi'], [11.05, 14.39, u'dersin']]
+     
+    startIndex = 0
+    endIndex = -1 
+    alignmentErrors = _evalAlignmentError(annotationURI, detectedList, tierAliases.phrases, startIndex, endIndex)
+    print alignmentErrors
+         
 #     print  mean, " ", stDev
+
+
+def testreadNonEmptyTokensTextGrid():
     
+    from WordLevelEvaluator import readNonEmptyTokensTextGrid, TextGrid2WordList, tierAliases
+
+    lowLevel = tierAliases.xsampadetails # read phonemesAnno
+    lyricsTextGrid = '/Users/joro/Documents/Phd/UPF/JingjuSingingAnnotation/lyrics2audio/praat_rules/fold1/xixiangji_biyuntian.TextGrid'
+    phonemesAnnoList, phonemesAnnoListNoPauses = readNonEmptyTokensTextGrid(lyricsTextGrid, lowLevel, 0, -1)
+    print phonemesAnnoListNoPauses
+
+if __name__ == '__main__':
+#     testOneFile()    
+    testreadNonEmptyTokensTextGrid()

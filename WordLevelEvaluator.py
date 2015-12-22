@@ -26,7 +26,7 @@ sys.path.append(pathUtils )
 
 
 from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList
-from Utilz import getMeanAndStDevError, writeListOfListToTextFile
+from Utilz import getMeanAndStDev, writeListOfListToTextFile
 
 
 ANNOTATION_EXT = '.TextGrid'
@@ -42,8 +42,8 @@ class Enumerate(object):
       setattr(self, name, number)
 
 # tierAliases = Enumerate("phonemeLevel wordLevel phraseLevel lyrics-syllables-pinyin sections")
-tierAliases = Enumerate("phonemes words phrases pinyin sections line details detailsgeorgi")
-tier_names = ["phonemes", "words", "phrases", "pinyin", "sections", "line", "details", "detailsgeorgi"];
+tierAliases = Enumerate("phonemes words phrases pinyin sections line details xsampadetails")
+tier_names = ["phonemes", "words", "phrases", "pinyin", "sections", "line", "details", "xsampadetails"];
 
 # tierAliases = Enumerate("phonemes words phrases pinyin sections line detailsgeorgi")
 # tier_names = ["phonemes", "words", "phrases", "pinyin", "sections", "line", "detailsgeorgi"];
@@ -114,11 +114,17 @@ def loadDetectedTokenListFromMlf( detectedURI, whichLevel=2 ):
     # # prepare list of phrases/phonemes from DETECTED:
     if whichLevel == tierAliases.phonemes:
         detectedTokenList= mlf2PhonemesAndTsList(detectedURI)
-    elif whichLevel == tierAliases.words or whichLevel == tierAliases.phrases :
+    elif whichLevel == tierAliases.words or whichLevel == tierAliases.phrases or whichLevel == tierAliases.pinyin :
         detectedTokenList= mlf2WordAndTsList(detectedURI)
     else:
-        sys.exit("level could be only phoneme- or word-level")
-    return detectedTokenList
+        sys.exit("level could be only phoneme- or word- or syllable_pinyin-level")
+    
+    detectedTokenListNoPauses = []    
+    for token in detectedTokenList:
+        if token[2] != 'REST':
+            detectedTokenListNoPauses.append(token)
+                
+    return detectedTokenListNoPauses
         
 
 
@@ -291,7 +297,7 @@ def evalOneFile(argv):
         audio_URI = argv[4]
         alignmentErrors  = evalAlignmentError(annoURI , detectedURI  , evalLevel)
         
-        mean, stDev, median = getMeanAndStDevError(alignmentErrors)
+        mean, stDev, median = getMeanAndStDev(alignmentErrors)
         
         # optional
 #         print "mean : ", mean, "st dev: " , stDev
@@ -376,7 +382,7 @@ if __name__ == '__main__':
 
     # Idx starts from 0 following python indexing.
     alignmentErrors = _evalAlignmentError(annotationURI, detectedList, tierAliases.phrases, startIdx=0, endIdx=7)
-    mean, stDev, median = getMeanAndStDevError(alignmentErrors)
+    mean, stDev, median = getMeanAndStDev(alignmentErrors)
         
     print  mean, " ", stDev
     

@@ -32,6 +32,11 @@ def tab2PraatAndOpenWithPRaat(argv):
         logging.warning("Praat not found at given path {}, skipping opening Praat ..\n")
         return
     
+    textGridURI =  os.path.join(dirName, fileName)  +  '.TextGrid'
+    if not os.path.isfile(textGridURI):
+        sys.exit("TextGrid file {} does not exist".format(textGridURI))
+
+    
     comparisonTextGridURI =  os.path.join(dirName, fileName)  + ext + 'TextGrid'
     if os.path.isfile(comparisonTextGridURI):
         raw_input("there is already a file {}! You may overwrite it! \n do you want to proceed? ".format(comparisonTextGridURI))

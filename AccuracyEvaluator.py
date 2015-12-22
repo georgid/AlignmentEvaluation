@@ -16,10 +16,10 @@ pathUtils = os.path.join(parentDir, 'utilsLyrics')
 sys.path.append(pathUtils )
 from Utilz import  readListOfListTextFile
 
-def evalAccuracy(URIrecordingAnno, outputHTKPhoneAlignedURI, whichTier=2 ):
+def evalAccuracy(URIrecordingAnno, outputHTKPhoneAlignedURI, whichTier, startIdx, endIdx ):
     
     detectedTokenList = loadDetectedTokenListFromMlf( outputHTKPhoneAlignedURI, whichTier )
-    durationCorrect, totalDuration = _evalAccuracy(URIrecordingAnno, detectedTokenList, whichTier)
+    durationCorrect, totalDuration = _evalAccuracy(URIrecordingAnno, detectedTokenList, whichTier, startIdx, endIdx)
     return  durationCorrect, totalDuration 
 
 def _evalAccuracy(annotationURI, detectedTokenList, whichTier, startIdx, endIdx):

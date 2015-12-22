@@ -64,8 +64,10 @@ def tokenList2TabFile( listTsAndPhonemes,  baseNameAudioFile, whichSuffix):
     
     # timeshift
 #     for index in range(len(listTsAndPhonemes)):
-#         listTsAndPhonemes[index][0] = listTsAndPhonemes[index][0] + timeShift
-#         if (len(listTsAndPhonemes[index]) == 3): 
+#         listTsAndPhonemes[index][0] +=  timeShift
+#         listTsAndPhonemes[index][1] +=  timeShift
+
+#         if (len(listTsAndPhonemes[index]) == 3): mlf-caused issue
 #             del listTsAndPhonemes[index][1]
         
     phonemeAlignedfileName = baseNameAudioFile + whichSuffix
@@ -234,16 +236,19 @@ def mlf2WordAndTsList(inputFileName):
     
     allLines = loadTextFile(inputFileName)
     
+    # skip first two control lines and last . 
     listWordsAndTs = allLines[2:-1]
         
     currentTokenIndex = 0    
     tokens =  listWordsAndTs[currentTokenIndex].split(" ")
+    lastLineReached = 0
     
-    while currentTokenIndex < len(listWordsAndTs):
+    while currentTokenIndex <= len(listWordsAndTs):
         
         # get begin ts 
-        startTime = float(tokens[0])/10000000
-        wordMETU = tokens[-1].strip()
+        if len(tokens) == LENGTH_TOKENS_NEW_WORD:
+            startTime = float(tokens[0])/10000000
+            wordMETU = tokens[-1].strip()
         
         # move to next        
         prevTokens = tokens 
@@ -251,7 +256,7 @@ def mlf2WordAndTsList(inputFileName):
         
         # sanity check
         if currentTokenIndex >= len(listWordsAndTs):
-            endTime =  float(prevTokens[1])/10000000
+            endTime =  float(tokens[1])/10000000
             extracedWordList.append([startTime, endTime, wordMETU])     
  
             break
@@ -272,12 +277,15 @@ def mlf2WordAndTsList(inputFileName):
             
             prevTokens = tokens 
             currentTokenIndex += 1
-            tokens =  listWordsAndTs[currentTokenIndex].split(" ")
+            if currentTokenIndex < len(listWordsAndTs):
+                tokens =  listWordsAndTs[currentTokenIndex].split(" ")
+            else:
+                lastLineReached = 1;
         
         # end of word. after inner while loop  
-        endTime =  float(prevTokens[1])/10000000
-        
-        extracedWordList.append([startTime, endTime, wordMETU])     
+        if not lastLineReached:
+            endTime =  float(prevTokens[1])/10000000
+            extracedWordList.append([startTime, endTime, wordMETU])     
         
     return extracedWordList    
     
