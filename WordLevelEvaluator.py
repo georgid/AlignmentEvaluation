@@ -26,7 +26,7 @@ sys.path.append(pathUtils )
 
 
 from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList
-from Utilz import getMeanAndStDev, writeListOfListToTextFile
+from Utilz import getMeanAndStDevError, writeListOfListToTextFile
 
 
 ANNOTATION_EXT = '.TextGrid'
