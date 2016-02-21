@@ -26,7 +26,7 @@ parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file
 pathUtils = os.path.join(parentDir, 'utilsLyrics')
 sys.path.append(pathUtils )
 
-from Utilz import writeListOfListToTextFile, loadTextFile 
+from utilsLyrics.Utilz import writeListOfListToTextFile, loadTextFile 
    
 def prepareOutputForPraat(outputHTKPhoneAlignedURI, wordAlignedSuffix, phonemeAlignedSuffix):
         '''

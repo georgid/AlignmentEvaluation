@@ -26,7 +26,7 @@ sys.path.append(pathUtils )
 
 
 from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList
-from Utilz import getMeanAndStDevError, writeListOfListToTextFile
+from utilsLyrics.Utilz import getMeanAndStDevError, writeListOfListToTextFile
 
 
 ANNOTATION_EXT = '.TextGrid'
@@ -42,8 +42,8 @@ class Enumerate(object):
       setattr(self, name, number)
 
 # tierAliases = Enumerate("phonemeLevel wordLevel phraseLevel lyrics-syllables-pinyin sections")
-tierAliases = Enumerate("phonemes words phrases pinyin sections line details xsampadetails")
-tier_names = ["phonemes", "words", "phrases", "pinyin", "sections", "line", "details", "xsampadetails"];
+tierAliases = Enumerate("phonemes words phrases pinyin sections line details xsampadetails dian dianDuration")
+tier_names = ["phonemes", "words", "phrases", "pinyin", "sections", "line", "details", "xsampadetails", "dian", "dianDuration"];
 
 # tierAliases = Enumerate("phonemes words phrases pinyin sections line detailsgeorgi")
 # tier_names = ["phonemes", "words", "phrases", "pinyin", "sections", "line", "detailsgeorgi"];

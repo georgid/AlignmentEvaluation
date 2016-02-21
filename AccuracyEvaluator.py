@@ -14,7 +14,7 @@ parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(sys.ar
 
 pathUtils = os.path.join(parentDir, 'utilsLyrics')
 sys.path.append(pathUtils )
-from Utilz import  readListOfListTextFile
+from utilsLyrics.Utilz import  readListOfListTextFile
 
 def evalAccuracy(URIrecordingAnno, outputHTKPhoneAlignedURI, whichTier, startIdx, endIdx ):
     
