@@ -35,21 +35,10 @@ AUDIO_EXT = '.wav'
 
 ##################################################################################
 
-# utility enumerate constants class 
-class Enumerate(object):
-  def __init__(self, names):
-    for number, name in enumerate(names.split()):
-      setattr(self, name, number)
-
-# tierAliases = Enumerate("phonemeLevel wordLevel phraseLevel lyrics-syllables-pinyin sections")
-tierAliases = Enumerate("phonemes words phrases pinyin sections line details xsampadetails dian dianDuration")
-tier_names = ["phonemes", "words", "phrases", "pinyin", "sections", "line", "details", "xsampadetails", "dian", "dianDuration"];
-
-# tierAliases = Enumerate("phonemes words phrases pinyin sections line detailsgeorgi")
-# tier_names = ["phonemes", "words", "phrases", "pinyin", "sections", "line", "detailsgeorgi"];
 
 
-def determineSuffix(withDuration, withSynthesis, evalLevel):
+
+def determineSuffixOld(withDuration, withSynthesis, evalLevel):
     '''
     
     lookup suffix for result files  depending on which algorithm used
@@ -66,6 +55,8 @@ def determineSuffix(withDuration, withSynthesis, evalLevel):
         tokenAlignedSuffix = '.' + evalLevelToken + 'Aligned'
         phonemesAlignedSuffix = '.phonemesAligned'
     return tokenAlignedSuffix, phonemesAlignedSuffix
+
+
 
 
 '''
@@ -208,48 +199,7 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx,
 
 
 # def readNonEmptyTokensTextGrid(annotationURI, whichLevel, initialTimeOffset=0, startIdx, endIdx):
-def readNonEmptyTokensTextGrid(annotationURI, whichLevel, startIdx, endIdx):
-    '''
-    ######################
-    # prepare list of phrases from ANNOTATION. remove empty annotation tokens
-    @param endIdx: set endIdx to be -1 if all tokens wanted
-    
-    @return: annotationTokenListNoPauses - list of tuples (index from original list of tokens, token with lyrics)
-    '''
-    try:
-        annotationTokenListAll = TextGrid2WordList(annotationURI, whichLevel)
-    except Exception as errorMsg:
-        sys.exit(str(errorMsg))
-    
-    if endIdx != -1:
-        annotationTokenListAll = annotationTokenListAll[startIdx : endIdx+1]
-    
-    for currAnnoTsAndToken in annotationTokenListAll:
-        currAnnoTsAndToken[0] = float(currAnnoTsAndToken[0])
-        # currAnnoTsAndToken[0] += initialTimeOffset
-        currAnnoTsAndToken[1] = float(currAnnoTsAndToken[1])
-        # currAnnoTsAndToken[1] += initialTimeOffset
 
-    
-    # store to file .anno
-    baseN = os.path.basename(annotationURI)
-    dir = os.path.dirname(annotationURI)
-    annotationURI_anno = os.path.join(dir,baseN+'.anno')
-    
-    
-#     writeListOfListToTextFile(annotationTokenListAll, None,   annotationURI_anno )
-
-    annotationTokenListNoPauses = []
-    
-    #########
-    # remove empty phrases
-
-    for idxListAll,currAnnoTsAndToken in enumerate(annotationTokenListAll):
-        if currAnnoTsAndToken[2] != "" and not (currAnnoTsAndToken[2].isspace()): # skip empty phrases
-            currAnnoTsAndToken.append(idxListAll) # add index to list of all tokens
-            annotationTokenListNoPauses.append(currAnnoTsAndToken)
-
-    return annotationTokenListAll, annotationTokenListNoPauses
 
 
 

@@ -43,15 +43,6 @@ def testOneFile():
 #     print  mean, " ", stDev
 
 
-def testreadNonEmptyTokensTextGrid():
-    
-    from WordLevelEvaluator import readNonEmptyTokensTextGrid, TextGrid2WordList, tierAliases
-
-    lowLevel = tierAliases.xsampadetails # read phonemesAnno
-    lyricsTextGrid = '/Users/joro/Documents/Phd/UPF/JingjuSingingAnnotation/lyrics2audio/praat_rules/fold1/xixiangji_biyuntian.TextGrid'
-    phonemesAnnoList, phonemesAnnoListNoPauses = readNonEmptyTokensTextGrid(lyricsTextGrid, lowLevel, 0, -1)
-    print phonemesAnnoListNoPauses
 
 if __name__ == '__main__':
-#     testOneFile()    
-    testreadNonEmptyTokensTextGrid()
+    testOneFile()    

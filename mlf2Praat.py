@@ -5,7 +5,7 @@ Created on Feb 10, 2015
 '''
 import sys
 from PraatVisualiser import addAlignmentResultToTextGridFIle, tokenList2TabFile
-from WordLevelEvaluator import determineSuffix, loadDetectedTokenListFromMlf
+from WordLevelEvaluator import determineSuffixOld, loadDetectedTokenListFromMlf
 import os
 from tab2PraatAndOpenWithPRaat import tab2PraatAndOpenWithPRaat
 
@@ -19,7 +19,7 @@ def mlfResult2TextGrid(argv):
     detectedHTK_URI= argv[1]
     whichEvalLevel =  int(argv[2])
     
-    tokenAlignedSuffix, dummy = determineSuffix(withDuration=False, withSynthesis='dummy', evalLevel=whichEvalLevel)
+    tokenAlignedSuffix, dummy = determineSuffixOld(withDuration=False, withSynthesis='dummy', evalLevel=whichEvalLevel)
     
     # load result from file into python list
     detectedTokenList = loadDetectedTokenListFromMlf( detectedHTK_URI, whichEvalLevel )
