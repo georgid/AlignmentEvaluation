@@ -24,8 +24,12 @@ sys.path.append(parentDir)
 pathUtils = os.path.join(parentDir,  'utilsLyrics')
 sys.path.append(pathUtils )
 
+pathAlignment = os.path.join(parentDir,  'AlignmentDuration')
+print pathAlignment
+sys.path.append(pathAlignment )
 
-from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList
+
+from parse.TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList
 from utilsLyrics.Utilz import getMeanAndStDevError, writeListOfListToTextFile
 
 
