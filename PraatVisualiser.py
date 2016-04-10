@@ -26,7 +26,7 @@ parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(sys.ar
 pathUtils = os.path.join(parentDir, 'utilsLyrics')
 sys.path.append(pathUtils )
 
-from Utilz import writeListOfListToTextFile, loadTextFile 
+from utilsLyrics.Utilz import writeListOfListToTextFile, loadTextFile 
    
 def prepareOutputForPraat(outputHTKPhoneAlignedURI, wordAlignedSuffix, phonemeAlignedSuffix):
         '''
@@ -279,5 +279,46 @@ def mlf2WordAndTsList(inputFileName):
         
         extracedWordList.append([startTime, endTime, wordMETU])     
         
-    return extracedWordList    
+    return extracedWordList 
+
+
+def visualiseInPraat(URIrecordingNoExt,  withDuration, detectedFileName, detectedWordList = [], grTruthDurationWordList=[]):
+    ### OPTIONAL############# : PRAAT
+    pathToAudioFile = URIrecordingNoExt + '.wav'
+    URIGrTruth = URIrecordingNoExt + ANNOTATION_EXT
+    
+    AlignedSuffix, phonemesAlignedSuffix = determineSuffix
+    
+# gr truth
+# TODO: what to do with detection.
+#     if grTruthDurationWordList != None and grTruthDurationWordList != []:
+#         grTruthDurationfileExtension = '.grTruthDuration'
+#         
+#         
+#         tokenList2TextGrid(tokenAlignedfileName, URIGrTruth)
+
+# detected
+    if detectedWordList != None and detectedWordList != []:
+        if not withDuration and os.path.isfile(detectedWordList):
+            alignedResultPath, fileNameWordAnno = addAlignmentResultToTextGridFIle(detectedWordList, URIGrTruth, wordsAlignedSuffix, phonemesAlignedSuffix)
+        else:
+            tokenList2TextGrid(detectedFileName, URIGrTruth)
+         
+        # TODO: add phone-level for detected
+        
+
+# open final TextGrid in Praat 
+#     openTextGridInPraat(alignedResultPath, fileNameWordAnno, pathToAudioFile)
+
+
+def tokenList2TextGrid(tokenAlignedfileName, URIGrTruthTextGrid):
+    
+
+     
+    if os.path.isfile(URIGrTruthTextGrid):
+         alignedResultPath, fileNameWordAnno = _alignmentResult2TextGrid(URIGrTruthTextGrid, tokenAlignedfileName) 
+    else:
+#  if no Textgrid groundTruthAnnotation present : open with Praat
+        tab2PraatAndOpenWithPRaat(['dummy', tokenAlignedfileName] )
+   
     

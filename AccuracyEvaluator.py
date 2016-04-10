@@ -14,7 +14,7 @@ parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(sys.ar
 
 pathUtils = os.path.join(parentDir, 'utilsLyrics')
 sys.path.append(pathUtils )
-from Utilz import  readListOfListTextFile
+from utilsLyrics.Utilz import  readListOfListTextFile
 
 def evalAccuracy(URIrecordingAnno, outputHTKPhoneAlignedURI, whichLevel=2 ):
     
@@ -22,7 +22,7 @@ def evalAccuracy(URIrecordingAnno, outputHTKPhoneAlignedURI, whichLevel=2 ):
     durationCorrect, totalDuration = _evalAccuracy(URIrecordingAnno, detectedTokenList, whichLevel)
     return  durationCorrect, totalDuration 
 
-def _evalAccuracy(annotationURI, detectedTokenList, whichLevel=2 ):
+def _evalAccuracy(annotationURI, detectedTokenList, whichLevel=2, beginTsOffsetAnnotaion=0 ):
     '''
 Calculate accuracy as suggested in
 Fujihara paper
@@ -41,10 +41,9 @@ TODO: eval performance of end timest. only and compare with begin ts.
     '''
     
         ######################  
-    annotationTokenListNoPauses, detectedTokenListNoPauses, finalTsAnno, finalTsDetected = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel)
+    annotationTokenListNoPauses, detectedTokenListNoPauses = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel)
     
-    # WoRKAROUND. because currenty I dont store final sil in textFile .*Aligned 
-    finalTsDetected = finalTsAnno
+
 
     durationCorrect = 0;
 
@@ -71,11 +70,12 @@ TODO: eval performance of end timest. only and compare with begin ts.
             sys.exit('token (phrase) with no subtokens (words) in annotation file!')
         
         if  currentWordNumber >= len(detectedTokenListNoPauses):
-            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( currentWordNumber, len(detectedTokenListNoPauses)))
+            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible \n Detection: {} '\
+                     .format( currentWordNumber, len(detectedTokenListNoPauses), detectedTokenListNoPauses))
             
         
-        durationCorrect += calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, idx, currentWordNumber, numWordsInPhrase,  finalTsAnno, finalTsDetected)        
-        
+        durationCorrectCurr =  calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, idx, currentWordNumber, numWordsInPhrase,  beginTsOffsetAnnotaion)        
+        durationCorrect += durationCorrectCurr
         
         #### UPDATE: proceed in detection the number of subtokens in current token          
         currentWordNumber +=numWordsInPhrase
@@ -84,38 +84,42 @@ TODO: eval performance of end timest. only and compare with begin ts.
     if currentWordNumber != len(detectedTokenListNoPauses):
             sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( currentWordNumber, len(detectedTokenListNoPauses)))
 
-    totalLength = max(float(finalTsAnno), float(finalTsDetected)   )              
-    return  durationCorrect, totalLength 
+    totalLength = float(annotationTokenListNoPauses[-1][1])
+    return  durationCorrect, totalLength
 
 
-def calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, idx, currentWordNumber, numWordsInPhrase, finallTsAnno, finalTsDetected)  :
+def calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, idx, currentWordNumber, numWordsInPhrase, beginTsOffsetAnnotaion=0)  :
 #     phrase overlap correct
-    currBeginAnno = float(annotationTokenListNoPauses[idx][0])
-    currEndAnno = float(annotationTokenListNoPauses[idx][1])
+    currBeginAnno = float(annotationTokenListNoPauses[idx][0]) + beginTsOffsetAnnotaion
+    currEndAnno = float(annotationTokenListNoPauses[idx][1]) + beginTsOffsetAnnotaion
+    finallTsAnno = float(annotationTokenListNoPauses[-1][1]) + beginTsOffsetAnnotaion
 
     currBeginDetected  = detectedTokenListNoPauses[currentWordNumber][0]
     currEndDetected = detectedTokenListNoPauses[currentWordNumber + numWordsInPhrase - 1][1]
+    finalTsDetected = detectedTokenListNoPauses[-1][1]
+    
     
     correct = max(0,min(currEndAnno,currEndDetected) - max(currBeginAnno, currBeginDetected))
 
 #     silence overlap correct
-    if idx !=  (len(annotationTokenListNoPauses) - 1):
+    if idx <  (len(annotationTokenListNoPauses) - 1):
         nextBeginAnno = float(annotationTokenListNoPauses[idx+1][0])
         
-        if currentWordNumber + numWordsInPhrase > len(detectedTokenListNoPauses) -1 :
+        if currentWordNumber + numWordsInPhrase > len(detectedTokenListNoPauses) - 1 :
             sys.exit("Error in avaluation. to do implement")
         nextBeginDetected = detectedTokenListNoPauses[currentWordNumber + numWordsInPhrase][0]
-        correct += max(0,min(nextBeginAnno,nextBeginDetected) - max(currEndAnno, currEndDetected))
+        correct += max(0, min(nextBeginAnno,nextBeginDetected) - max(currEndAnno, currEndDetected))
     else:
         if (currEndAnno > finalTsDetected):  
-            sys.exit("currEndAnno > finalTsDetected")
+            logging.warning("currEndAnno > finalTsDetected")
         if (currEndDetected > finallTsAnno ):
             # WORKAROUND
+            logging.warn("currEndDetected {} > finallTsAnno {}. Making currEndDetected = finallTsAnno ".format(currEndDetected, finallTsAnno))
             currEndDetected = finallTsAnno
-            logging.warn("currEndDetected > finallTsAnno")
         
         correct += max(0,min(finallTsAnno,finalTsDetected) - max(currEndAnno, currEndDetected))
-        
+    
+       
     return correct
 
 

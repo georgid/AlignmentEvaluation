@@ -26,7 +26,7 @@ sys.path.append(pathUtils )
 
 
 from TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tier_names
-from Utilz import getMeanAndStDevError
+from utilsLyrics.Utilz import getMeanAndStDevError
 
 
 ANNOTATION_EXT = '.TextGrid'
@@ -140,7 +140,7 @@ TODO: eval performance of end timest. only and compare with begin ts.
     alignmentErrors = []
     
         ######################  
-    annotationTokenListNoPauses, detectedTokenListNoPauses, dummy, dummy = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel)
+    annotationTokenListNoPauses, detectedTokenListNoPauses = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel)
     
     if len(annotationTokenListNoPauses) == 0:
         logging.warn(annotationURI + ' is empty!')
@@ -190,8 +190,12 @@ prepare list of tokens. remove detected tokens NOISE, sil, sp entries from  dete
 def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel):
     detectedTokenListNoPauses = [] #result
     for detectedTsAndToken in detectedTokenList:
-        if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE' and detectedTsAndToken[2] != '_SAZ_':
-            detectedTokenListNoPauses.append(detectedTsAndToken)
+        if whichLevel == tierAliases.phraseLevel or whichLevel == tierAliases.wordLevel: 
+            if detectedTsAndToken[2].__str__() != 'sil'  and detectedTsAndToken[2].__str__() != '_SAZ_':
+                detectedTokenListNoPauses.append(detectedTsAndToken)
+        elif whichLevel == tierAliases.phonemeLevel:
+            if detectedTsAndToken[2].__str__() != 'NOISE' and detectedTsAndToken[2].__str__() != 'sp':
+                detectedTokenListNoPauses.append(detectedTsAndToken)
     
 ######################
 # prepare list of phrases from ANNOTATION. remove empy annotaion tokens
@@ -208,7 +212,7 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel):
         if currAnnoTsAndToken[2] != "" and not (currAnnoTsAndToken[2].isspace()): # skip empty phrases
             annotationTokenListNoPauses.append(currAnnoTsAndToken)
     
-    return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), detectedTokenList[-1][1]
+    return annotationTokenListNoPauses, detectedTokenListNoPauses
 
 
 
