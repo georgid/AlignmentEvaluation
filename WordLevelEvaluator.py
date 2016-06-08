@@ -29,7 +29,7 @@ print pathAlignment
 sys.path.append(pathAlignment )
 
 
-from parse.TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList
+from parse.TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tierAliases, tier_names, readNonEmptyTokensTextGrid
 from utilsLyrics.Utilz import getMeanAndStDevError, writeListOfListToTextFile
 
 
@@ -202,7 +202,6 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx,
     return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), detectedTokenList[-1][1], initialTimeOffset
 
 
-# def readNonEmptyTokensTextGrid(annotationURI, whichLevel, initialTimeOffset=0, startIdx, endIdx):
 
 
 
