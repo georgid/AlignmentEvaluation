@@ -190,6 +190,7 @@ prepare list of tokens. remove detected tokens NOISE, sil, sp entries from  dete
 def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel):
     detectedTokenListNoPauses = [] #result
     for detectedTsAndToken in detectedTokenList:
+        detectedTsAndToken = detectedTsAndToken[0] # quick and dirty fix! word is [ [word] ]
         if whichLevel == tierAliases.phraseLevel or whichLevel == tierAliases.wordLevel: 
             if detectedTsAndToken[2].__str__() != 'sil'  and detectedTsAndToken[2].__str__() != '_SAZ_':
                 detectedTokenListNoPauses.append(detectedTsAndToken)

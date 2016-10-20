@@ -54,7 +54,7 @@ def TextGrid2WordList(textgrid_file, whichLevel=2):
 			tier_details = tier.make_simple_transcript();		#this function parse the file nicely and return cool tuples
 			
 			for line in tier_details:
-				beginTsAndWordList.append([line[0], line[1], line[2]])
+				beginTsAndWordList.append(  [float(line[0]), float(line[1]), line[2] ] )
     if not isTierFound:
 		raise Exception('tier in file {0} might not be named correctly. Name it {1}' .format(textgrid_file, tier_names[whichLevel]))
     return beginTsAndWordList		
