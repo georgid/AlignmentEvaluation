@@ -4,8 +4,8 @@ Created on Feb 10, 2015
 @author: joro
 '''
 import sys
-from PraatVisualiser import addAlignmentResultToTextGridFIle, tokenList2TabFile
-from WordLevelEvaluator import determineSuffixOld, loadDetectedTokenListFromMlf
+from align_eval.PraatVisualiser import addAlignmentResultToTextGridFIle, tokenList2TabFile
+from align_eval.WordLevelEvaluator import determineSuffixOld, loadDetectedTokenListFromMlf
 import os
 from tab2PraatAndOpenWithPRaat import tab2PraatAndOpenWithPRaat
 

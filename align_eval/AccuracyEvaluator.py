@@ -3,7 +3,7 @@ Created on Feb 24, 2015
 
 @author: joro
 '''
-from WordLevelEvaluator import stripNonLyricsTokens,\
+from align_eval.WordLevelEvaluator import stripNonLyricsTokens,\
     loadDetectedTokenListFromMlf
 import logging
 import sys

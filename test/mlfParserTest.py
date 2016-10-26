@@ -3,8 +3,8 @@ Created on Dec 1, 2015
 
 @author: joro
 '''
-from PraatVisualiser import ANNOTATION_EXT
-from WordLevelEvaluator import DETECTED_EXT, AUDIO_EXT, tierAliases,\
+from align_eval.PraatVisualiser import ANNOTATION_EXT
+from align_eval.WordLevelEvaluator import DETECTED_EXT, AUDIO_EXT, tierAliases,\
     loadDetectedTokenListFromMlf
 import os
 

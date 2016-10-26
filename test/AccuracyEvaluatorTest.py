@@ -4,7 +4,7 @@ Created on Jun 30, 2015
 @author: joro
 '''
 import os
-from AccuracyEvaluator import _evalAccuracy
+from align_eval.AccuracyEvaluator import _evalAccuracy
 import sys
 
 # file parsing tools as external lib 

@@ -3,8 +3,8 @@ Created on Jun 30, 2015
 
 @author: joro
 '''
-from WordLevelEvaluator import _evalAlignmentError, tierAliases
-from PraatVisualiser import ANNOTATION_EXT
+from align_eval.WordLevelEvaluator import _evalAlignmentError, tierAliases
+from align_eval.PraatVisualiser import ANNOTATION_EXT
 import os
 
 

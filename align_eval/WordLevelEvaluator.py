@@ -11,7 +11,7 @@ This is similar to proposed by shriberg on sentence boundary detection.
 import os
 import sys
 import numpy
-from PraatVisualiser import mlf2PhonemesAndTsList, mlf2WordAndTsList,\
+from align_eval.PraatVisualiser import mlf2PhonemesAndTsList, mlf2WordAndTsList,\
     addAlignmentResultToTextGridFIle, openTextGridInPraat
 import logging
 
@@ -186,20 +186,25 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx,
 
     # detected token starts from time 0. Time offset needs to be added.
     initialTimeOffset = annotationTokenListA[0][0]
+    initialTimeOffset = 0
     for currDetectedTsAndToken in detectedTokenList:
+        currDetectedTsAndToken = currDetectedTsAndToken[0] # a word has one syllable
         currDetectedTsAndToken[0] = float(currDetectedTsAndToken[0])
         currDetectedTsAndToken[0] += initialTimeOffset
         currDetectedTsAndToken[1] = float(currDetectedTsAndToken[1])
         currDetectedTsAndToken[1] += initialTimeOffset
 
     detectedTokenListNoPauses = [] #result
-    for detectedTsAndToken in detectedTokenList:
-        if detectedTsAndToken[2] != 'sp' and detectedTsAndToken[2] != 'sil' and detectedTsAndToken[2] != 'NOISE' and detectedTsAndToken[2] != '_SAZ_' and detectedTsAndToken[2] != 'REST':
-            detectedTokenListNoPauses.append(detectedTsAndToken)
+    for currDetectedTsAndToken in detectedTokenList:
+        currDetectedTsAndToken = currDetectedTsAndToken[0] # a word has one syllable
+
+        if currDetectedTsAndToken[2] != 'sp' and currDetectedTsAndToken[2] != 'sil' and currDetectedTsAndToken[2] != 'NOISE' and currDetectedTsAndToken[2] != '_SAZ_' and currDetectedTsAndToken[2] != 'REST':
+            detectedTokenListNoPauses.append(currDetectedTsAndToken)
     
     for token in annotationTokenListNoPauses:
         token = token[0]
-    return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), detectedTokenList[-1][1], initialTimeOffset
+    finalTsDetected = detectedTokenList[-1][0][1]
+    return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), finalTsDetected, initialTimeOffset
 
 
 
