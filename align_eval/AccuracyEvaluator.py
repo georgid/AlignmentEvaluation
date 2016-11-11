@@ -52,17 +52,14 @@ TODO: eval performance of end timest. only and compare with begin ts.
     if len(annotationTokenListNoPauses) == 0:
         logging.warn(annotationURI + ' is empty! Check code')
         return durationCorrect
-    
-    
+
     if len(detectedTokenListNoPauses) == 0:
         logging.warn(' detected token list is empty! Check code')
         return durationCorrect
     
-    # loop in tokens of gr truth annotation
-    durationCorrect = min(float(annotationTokenListNoPauses[0][0]), detectedTokenListNoPauses[0][0]) - initialTimeOffset
-    
-    currentWordNumber = 0
-    for idx, currAnnoTsAndToken in enumerate(annotationTokenListNoPauses):
+    ##########  divide phrases into tokens
+    num_tokens_in_phrase = []
+    for  currAnnoTsAndToken in annotationTokenListNoPauses:
        
         currAnnoTsAndToken[2] = currAnnoTsAndToken[2].strip()
         subtokens = currAnnoTsAndToken[2].split()
@@ -71,19 +68,29 @@ TODO: eval performance of end timest. only and compare with begin ts.
         if numWordsInPhrase == 0:
             sys.exit('token (phrase) with no subtokens (words) in annotation file!')
         
-        if  currentWordNumber >= len(detectedTokenListNoPauses):
-            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( len(annotationTokenListNoPauses), len(detectedTokenListNoPauses)))
-            
+        num_tokens_in_phrase.append(numWordsInPhrase)
+    
+
+    ##### check anotation and detection have same number of tokens
+    if sum(num_tokens_in_phrase) != len(detectedTokenListNoPauses):
+            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible \n Detection: {} \n Annotation: {}'\
+                     .format( sum(num_tokens_in_phrase), len(detectedTokenListNoPauses), detectedTokenListNoPauses, annotationTokenListNoPauses))
+    
+    # initialize initial time offset
+    durationCorrect = min(float(annotationTokenListNoPauses[0][0]), detectedTokenListNoPauses[0][0]) - initialTimeOffset
+    # evaluate: loop in tokens of gr truth annotation
+    currentWordNumber = 0
+    for idx, currAnnoTsAndToken in enumerate(annotationTokenListNoPauses):
         
-        durationCorrect += calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, idx, currentWordNumber, numWordsInPhrase,  finalTsAnno, finalTsDetected)        
-        
+        durationCorrectCurr = calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, \
+                            idx, currentWordNumber,  num_tokens_in_phrase[idx], finalTsAnno, finalTsDetected)         
+        durationCorrect += durationCorrectCurr
         
         #### UPDATE: proceed in detection the number of subtokens in current token          
-        currentWordNumber +=numWordsInPhrase
+        currentWordNumber += num_tokens_in_phrase[idx]
     
-    # sanity check: 
-    if currentWordNumber != len(detectedTokenListNoPauses):
-            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( len(annotationTokenListNoPauses), len(detectedTokenListNoPauses) ) )
+     
+   
 
     totalLength = max(float(finalTsAnno), float(finalTsDetected)   )       -       initialTimeOffset
     return  durationCorrect, totalLength 

@@ -186,7 +186,6 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx,
 
     # detected token starts from time 0. Time offset needs to be added.
     initialTimeOffset = annotationTokenListA[0][0]
-    initialTimeOffset = 0
     for currDetectedTsAndToken in detectedTokenList:
         currDetectedTsAndToken = currDetectedTsAndToken[0] # a word has one syllable
         currDetectedTsAndToken[0] = float(currDetectedTsAndToken[0])
@@ -198,7 +197,7 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx,
     for currDetectedTsAndToken in detectedTokenList:
         currDetectedTsAndToken = currDetectedTsAndToken[0] # a word has one syllable
 
-        if currDetectedTsAndToken[2] != 'sp' and currDetectedTsAndToken[2] != 'sil' and currDetectedTsAndToken[2] != 'NOISE' and currDetectedTsAndToken[2] != '_SAZ_' and currDetectedTsAndToken[2] != 'REST':
+        if currDetectedTsAndToken[2] != 'sp' and currDetectedTsAndToken[2] != 'sil' and currDetectedTsAndToken[2] != 'NOISE' and currDetectedTsAndToken[2] != 'REST':
             detectedTokenListNoPauses.append(currDetectedTsAndToken)
     
     for token in annotationTokenListNoPauses:
