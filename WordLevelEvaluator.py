@@ -192,7 +192,7 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel):
     for detectedTsAndToken in detectedTokenList:
         detectedTsAndToken = detectedTsAndToken[0] # quick and dirty fix! word is [ [word] ]
         if whichLevel == tierAliases.phraseLevel or whichLevel == tierAliases.wordLevel: 
-            if detectedTsAndToken[2].__str__() != 'sil'  and detectedTsAndToken[2].__str__() != '_SAZ_':
+#             if detectedTsAndToken[2].__str__() != 'sil'  and detectedTsAndToken[2].__str__() != '_SAZ_':
                 detectedTokenListNoPauses.append(detectedTsAndToken)
         elif whichLevel == tierAliases.phonemeLevel:
             if detectedTsAndToken[2].__str__() != 'NOISE' and detectedTsAndToken[2].__str__() != 'sp':
