@@ -14,10 +14,14 @@ if parentDir not in sys.path:
       sys.path.append(parentDir)
 pathUtils = os.path.join(parentDir, 'utilsLyrics')
 
-from Utilz import  readListOfListTextFile
+def _evalAccuracy_test():
+    '''
+    test  evalAccuracy evaluation script  makes sense
+    '''
+    
+    
 
-
-def evalAccuracyTest():
+def evalAccuracyTest_jingju_old():
 
 ######### for test logic see WordLevelEvaluator instead
 
@@ -48,4 +52,6 @@ def evalAccuracyTest():
     print totalLength
     print durationCorrect/totalLength
 
-evalAccuracyTest()
+if __name__ == '__main__':
+    evalAccuracyTest_jingju_old()
+    

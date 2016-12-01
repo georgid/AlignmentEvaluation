@@ -12,7 +12,7 @@ import os
 import sys
 import numpy
 from align_eval.PraatVisualiser import mlf2PhonemesAndTsList, mlf2WordAndTsList,\
-    addAlignmentResultToTextGridFIle, openTextGridInPraat
+    addAlignmentResultToTextGrid_htk, openTextGridInPraat
 import logging
 
 
@@ -184,14 +184,11 @@ prepare list of tokens. remove detected tokens NOISE, sil, sp entries from  dete
 def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx, endIdx):
     annotationTokenListA, annotationTokenListNoPauses =  readNonEmptyTokensTextGrid(annotationURI, whichLevel, startIdx, endIdx)
 
-    # detected token starts from time 0. Time offset needs to be added.
-    initialTimeOffset = annotationTokenListA[0][0]
+    
     for currDetectedTsAndToken in detectedTokenList:
         currDetectedTsAndToken = currDetectedTsAndToken[0] # a word has one syllable
         currDetectedTsAndToken[0] = float(currDetectedTsAndToken[0])
-        currDetectedTsAndToken[0] += initialTimeOffset
         currDetectedTsAndToken[1] = float(currDetectedTsAndToken[1])
-        currDetectedTsAndToken[1] += initialTimeOffset
 
     detectedTokenListNoPauses = [] #result
     for currDetectedTsAndToken in detectedTokenList:
@@ -203,6 +200,8 @@ def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx,
     for token in annotationTokenListNoPauses:
         token = token[0]
     finalTsDetected = detectedTokenList[-1][0][1]
+ 
+    initialTimeOffset = annotationTokenListA[0][0]
     return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), finalTsDetected, initialTimeOffset
 
 
@@ -264,7 +263,7 @@ def evalOneFile(argv):
          ### OPTIONAL : open detection and annotation in praat. can be provided on request
 #         wordAlignedSuffix = '"wordsAligned"'
 #         phonemeAlignedSuffix =  '"phonemesAligned"'
-#         alignedResultPath, fileNameWordAnno = addAlignmentResultToTextGridFIle( detectedURI, annoURI,   wordAlignedSuffix, phonemeAlignedSuffix)
+#         alignedResultPath, fileNameWordAnno = addAlignmentResultToTextGrid_htk( detectedURI, annoURI,   wordAlignedSuffix, phonemeAlignedSuffix)
 #         
 #          
 #         openTextGridInPraat(alignedResultPath, fileNameWordAnno, audio_URI)

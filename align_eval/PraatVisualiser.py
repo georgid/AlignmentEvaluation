@@ -24,10 +24,11 @@ ANNOTATION_EXT = '.TextGrid'
 # utils to do reading and writing into text files  
 parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir)) 
 pathUtils = os.path.join(parentDir, 'utilsLyrics')
-sys.path.append(pathUtils )
+if pathUtils not in sys.path:
+    sys.path.append(pathUtils )
 
-from utilsLyrics.Utilz import writeListOfListToTextFile, loadTextFile 
-   
+from utilsLyrics.Utilz import writeListOfListToTextFile, loadTextFile
+
 def prepareOutputForPraat(outputHTKPhoneAlignedURI, wordAlignedSuffix, phonemeAlignedSuffix):
         '''
         parse output in HTK's mlf output format ; load into list; 
@@ -80,7 +81,7 @@ def tokenList2TabFile( listTsAndPhonemes,  baseNameAudioFile, whichSuffix):
     
 def addAlignmentResultToTextGrid(detectedTokenList,  grTruthAnnoURI, tokenAlignedSuffix):
     '''
-    same as addAlignmentResultToTextGridFIle, but
+    same as addAlignmentResultToTextGrid_htk, but
     instead of file with outputHTKPhoneAlignedURI use python list: @param detectedTokenList
     '''
     baseNameAudioFile = os.path.splitext(grTruthAnnoURI)[0]
@@ -90,7 +91,7 @@ def addAlignmentResultToTextGrid(detectedTokenList,  grTruthAnnoURI, tokenAligne
     return alignedResultPath, fileNameWordAnno               
 
 
-def addAlignmentResultToTextGridFIle( outputHTKPhoneAlignedURI, grTruthAnnoURI, wordAlignedSuffix, phonemeAlignedSuffix):
+def addAlignmentResultToTextGrid_htk( outputHTKPhoneAlignedURI, grTruthAnnoURI, wordAlignedSuffix, phonemeAlignedSuffix):
     '''
     called when HTK used and output written in mlf file
     @param outputHTKPhoneAlignedURI- output htk mlf format
