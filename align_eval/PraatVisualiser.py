@@ -27,7 +27,7 @@ pathUtils = os.path.join(parentDir, 'utilsLyrics')
 if pathUtils not in sys.path:
     sys.path.append(pathUtils )
 
-from utilsLyrics.Utilz import writeListOfListToTextFile, loadTextFile
+from src.utilsLyrics.Utilz import writeListOfListToTextFile, loadTextFile
 
 def prepareOutputForPraat(outputHTKPhoneAlignedURI, wordAlignedSuffix, phonemeAlignedSuffix):
         '''

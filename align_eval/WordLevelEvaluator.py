@@ -29,8 +29,8 @@ print pathAlignment
 sys.path.append(pathAlignment )
 
 
-from parse.TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tierAliases, tier_names, readNonEmptyTokensTextGrid
-from utilsLyrics.Utilz import getMeanAndStDevError, writeListOfListToTextFile
+from src.parse.TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tierAliases, tier_names, readNonEmptyTokensTextGrid
+from src.utilsLyrics.Utilz import getMeanAndStDevError, writeListOfListToTextFile
 
 
 ANNOTATION_EXT = '.TextGrid'

@@ -12,9 +12,9 @@ import os
 # file parsing tools as external lib 
 parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(sys.argv[0]) ), os.path.pardir)) 
 
-pathUtils = os.path.join(parentDir, 'utilsLyrics')
-sys.path.append(pathUtils )
-from utilsLyrics.Utilz import  readListOfListTextFile
+# pathUtils = os.path.join(parentDir, 'utilsLyrics')
+# sys.path.append(pathUtils )
+# from utilsLyrics.Utilz import  readListOfListTextFile
 
 def evalAccuracy(URIrecordingAnno, outputHTKPhoneAlignedURI, whichTier, startIdx, endIdx ):
     
