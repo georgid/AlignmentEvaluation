@@ -17,20 +17,25 @@ import logging
 
 
 # this allows path to packages to be resolved correctly (on import) from outside of eclipse 
-parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir)) 
-sys.path.append(parentDir)
+# parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__) ), os.path.pardir)) 
+# sys.path.append(parentDir)
+# 
+# # utilsLyrics
+# pathUtils = os.path.join(parentDir,  'utilsLyrics')
+# sys.path.append(pathUtils )
+# 
+# pathAlignment = os.path.join(parentDir,  'AlignmentDuration')
+# print pathAlignment
+# sys.path.append(pathAlignment )
+# 
+# 
+# from src.parse.TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tierAliases, tier_names, readNonEmptyTokensTextGrid
+# from src.utilsLyrics.Utilz import getMeanAndStDevError, writeListOfListToTextFile
 
-# utilsLyrics
-pathUtils = os.path.join(parentDir,  'utilsLyrics')
-sys.path.append(pathUtils )
+## the above lines are replaced by these because these functions are copied in this project to reduce inter-project dependencies
+from parse.TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tierAliases, tier_names, readNonEmptyTokensTextGrid
+from Utilz import getMeanAndStDevError
 
-pathAlignment = os.path.join(parentDir,  'AlignmentDuration')
-print pathAlignment
-sys.path.append(pathAlignment )
-
-
-from src.parse.TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tierAliases, tier_names, readNonEmptyTokensTextGrid
-from src.utilsLyrics.Utilz import getMeanAndStDevError, writeListOfListToTextFile
 
 
 ANNOTATION_EXT = '.TextGrid'
@@ -178,31 +183,44 @@ for description see related method: AccuracyEvaluator._evalAccuracy
 
 
 '''
-prepare list of tokens. remove detected tokens NOISE, sil, sp entries from  detectedTokenList and annoTokenList
 
 '''
-def stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx, endIdx):
-    annotationTokenListA, annotationTokenListNoPauses =  readNonEmptyTokensTextGrid(annotationURI, whichLevel, startIdx, endIdx)
+def stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx):
+    
+    '''
+    
+    prepare list of tokens. remove detected tokens NOISE, sil, sp entries from  detectedTokenList and annoTokenList
+
+    Parameters
+    ------------------------
+    whichTier: 
+        works only with the tier from TextGrid_Parsing  tier_names = ["phonemes", 'words', "phrases", "lyrics-syllables-pinyin", 'sections'];
+    startIdx: int
+         index of boundary in tier to be considered as start one  (from TextGrid -1 )
+    endIdx: int
+         index of end token
+    '''
+    annotationTokenListA, annotationTokenListNoPauses =  readNonEmptyTokensTextGrid(annotationURI, whichTier, startIdx, endIdx)
 
     
     for currDetectedTsAndToken in detectedTokenList:
-        currDetectedTsAndToken = currDetectedTsAndToken[0] # a word has one syllable
+#         currDetectedTsAndToken = currDetectedTsAndToken[0] # a word has one syllable
         currDetectedTsAndToken[0] = float(currDetectedTsAndToken[0])
         currDetectedTsAndToken[1] = float(currDetectedTsAndToken[1])
 
     detectedTokenListNoPauses = [] #result
     for currDetectedTsAndToken in detectedTokenList:
-        currDetectedTsAndToken = currDetectedTsAndToken[0] # a word has one syllable
+#         currDetectedTsAndToken = currDetectedTsAndToken[0] # a word has one syllable
 
         if currDetectedTsAndToken[2] != 'sp' and currDetectedTsAndToken[2] != 'sil' and currDetectedTsAndToken[2] != 'NOISE' and currDetectedTsAndToken[2] != 'REST':
             detectedTokenListNoPauses.append(currDetectedTsAndToken)
     
     for token in annotationTokenListNoPauses:
         token = token[0]
-    finalTsDetected = detectedTokenList[-1][0][1]
+
  
     initialTimeOffset = annotationTokenListA[0][0]
-    return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), finalTsDetected, initialTimeOffset
+    return annotationTokenListNoPauses, detectedTokenListNoPauses, float(annotationTokenListA[-1][1]), initialTimeOffset
 
 
 
@@ -253,7 +271,7 @@ def evalOneFile(argv):
         audio_URI = argv[4]
         alignmentErrors  = evalAlignmentError(annoURI , detectedURI  , evalLevel)
         
-        mean, stDev, median = getMeanAndStDev(alignmentErrors)
+        mean, stDev, median = getMeanAndStDevError(alignmentErrors)
         
         # optional
 #         print "mean : ", mean, "st dev: " , stDev

@@ -16,82 +16,115 @@ parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(sys.ar
 # sys.path.append(pathUtils )
 # from utilsLyrics.Utilz import  readListOfListTextFile
 
-def evalAccuracy(URIrecordingAnno, outputHTKPhoneAlignedURI, whichTier, startIdx, endIdx ):
+def evalAccuracy(annotationURI, outputHTKPhoneAlignedURI, whichTier, startIdx, endIdx ):
+    '''
+    Wrapper around _evalAccuracy() for txt file outputHTKPhoneAlignedURI
+    
+    Parameters
+    --------------
+    outputHTKPhoneAlignedURI: detected timestamps in htk's mlf format 
+    
+    other parameters same as in _evalAccuracy
+    '''
     
     detectedTokenList = loadDetectedTokenListFromMlf( outputHTKPhoneAlignedURI, whichTier )
-    durationCorrect, totalDuration = _evalAccuracy(URIrecordingAnno, detectedTokenList, whichTier, startIdx, endIdx)
+    
+    annotationTokenList, detectedTokenList, finalTsAnno,  initialTimeOffset = \
+     stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx)
+    
+    durationCorrect, totalDuration = _evalAccuracy(annotationTokenList, detectedTokenList, finalTsAnno,  initialTimeOffset)
     return  durationCorrect, totalDuration 
 
-def _evalAccuracy(annotationURI, detectedTokenList, whichTier, startIdx, endIdx):
+
+
+def split_into_tokens(tokens):
     '''
-Calculate accuracy as suggested in
-Fujihara: LyricSynchronizer: Automatic Synchronization System Between Musical Audio Signals and Lyrics
-Does not check token identities, but proceeds successively one-by-one  
-Make sure number of detected tokens (wihtout counting sp, sil ) is same as number of annotated tokens 
-
-    @param detectedTokenList: a list of triples: (startTs, endTs, wordID) 
-    @param annotationURI: URI of Praat annotaiton textgrid. 
-    @param whichTier works only with the tier from TextGrid_Parsing  tier_names = ["phonemes", 'words', "phrases", "lyrics-syllables-pinyin", 'sections'];
-    @param startIdx index of boundary in tier to be considered as start one  (from TextGrid -1 )
-    @param endIdx index of end token
-    
-    token: could be phoneme (consists of one subtoken -phoneme itself), word (consists of one subtoken -word itself) or phrase (consist of subtokens words ) 
-
-TODO: eval performance of end timest. only and compare with begin ts. 
-
+    split phrases of tokens by white spaces into words 
     '''
     
-        ######################  
-    annotationTokenListNoPauses, detectedTokenListNoPauses, finalTsAnno, finalTsDetected, initialTimeOffset = stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx)
+    idx_txt = -1 # assume the word is the last entry of a token (after begin timestamp etc.)
+    num_tokens_in_phrase = []
+    for currAnnoTsAndToken in tokens:
+        if  type(currAnnoTsAndToken) == str:
+            txt = currAnnoTsAndToken
+        else:
+            txt = currAnnoTsAndToken[idx_txt]
+        txt = txt.strip()
+        subtokens = txt.split()
+        numWordsInPhrase = len(subtokens)
+        if numWordsInPhrase == 0:
+            sys.exit('token (phrase) with no subtokens (words) in annotation file!')
+        num_tokens_in_phrase.append(numWordsInPhrase)
+    
+    return num_tokens_in_phrase, currAnnoTsAndToken
+
+def _evalAccuracy(reference_token_list, detected_Token_List, finalTsAnno, initialTimeOffset=0, reference_labels=None):
+    '''
+    Calculate accuracy as suggested in
+    Fujihara: LyricSynchronizer: Automatic Synchronization System Between Musical Audio Signals and Lyrics
+    Does not check token identities, but proceeds successively one-by-one  
+    Make sure number of detected tokens not counting special tokens (sp, sil ) is same as number of annotated tokens 
+
+    token: could be phoneme (consists of one subtoken -phoneme itself),
+    word (consists of one subtoken -word itself) or 
+    phrase (consist of subtokens words ) 
+
+
+    Parameters
+    -------------- 
+    detected_Token_List: list [[]]
+        a list of triples: (startTs, endTs, wordID) 
+    
+    reference_token_list: string
+        URI of Praat annotaiton textgrid file
+    
+    
+    '''
     
     # WoRKAROUND. because currenty I dont store final sil in detected textFile .*Aligned 
 #     finalTsDetected = finalTsAnno
 
     durationCorrect = 0;
 
-    if len(annotationTokenListNoPauses) == 0:
-        logging.warn(annotationURI + ' is empty! Check code')
+    if len(reference_token_list) == 0:
+        logging.warn(reference_token_list + ' is empty! Check code')
         return durationCorrect
 
-    if len(detectedTokenListNoPauses) == 0:
+    if len(detected_Token_List) == 0:
         logging.warn(' detected token list is empty! Check code')
         return durationCorrect
     
     ##########  divide phrases into tokens
-    num_tokens_in_phrase = []
-    for  currAnnoTsAndToken in annotationTokenListNoPauses:
-       
-        currAnnoTsAndToken[2] = currAnnoTsAndToken[2].strip()
-        subtokens = currAnnoTsAndToken[2].split()
-        numWordsInPhrase = len(subtokens)
-        
-        if numWordsInPhrase == 0:
-            sys.exit('token (phrase) with no subtokens (words) in annotation file!')
-        
-        num_tokens_in_phrase.append(numWordsInPhrase)
+    if reference_labels != None: # labels of reference tokens given separately 
+        num_tokens_in_phrase, currAnnoTsAndToken = split_into_tokens(reference_labels)
+    else: # labels should be the last field of reference_token_list
+        num_tokens_in_phrase, currAnnoTsAndToken = split_into_tokens(reference_token_list)
     
 
-    ##### check anotation and detection have same number of tokens
-    if sum(num_tokens_in_phrase) != len(detectedTokenListNoPauses):
+    ##### check that annotation and detection have same number of tokens
+    if sum(num_tokens_in_phrase) != len(detected_Token_List):
             sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible \n Detection: {} \n Annotation: {}'\
-                     .format( sum(num_tokens_in_phrase), len(detectedTokenListNoPauses), detectedTokenListNoPauses, annotationTokenListNoPauses))
+                     .format( sum(num_tokens_in_phrase), len(detected_Token_List), detected_Token_List, reference_token_list))
     
     # initialize initial time offset
-    durationCorrect = min(float(annotationTokenListNoPauses[0][0]), detectedTokenListNoPauses[0][0]) - initialTimeOffset
+    durationCorrect = min(float(reference_token_list[0][0]), detected_Token_List[0][0]) - initialTimeOffset
     # evaluate: loop in tokens of gr truth annotation
+
+    #     finalTsDetected = detectedTokenList[-1][0][1] # a word has one syllable
+    finalTsDetected = detected_Token_List[-1][1]
+
     currentWordNumber = 0
-    for idx, currAnnoTsAndToken in enumerate(annotationTokenListNoPauses):
+    for idx, currAnnoTsAndToken in enumerate(reference_token_list):
         
-        durationCorrectCurr = calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, \
+        durationCorrectCurr = calcCorrect(detected_Token_List, reference_token_list, \
                             idx, currentWordNumber,  num_tokens_in_phrase[idx], finalTsAnno, finalTsDetected)         
         durationCorrect += durationCorrectCurr
         
         #### UPDATE: proceed in detection the number of subtokens in current token          
         currentWordNumber += num_tokens_in_phrase[idx]
     
-     
-   
-
+    
+    
     totalLength = max(float(finalTsAnno), float(finalTsDetected)   )       -       initialTimeOffset
     return  durationCorrect, totalLength 
 

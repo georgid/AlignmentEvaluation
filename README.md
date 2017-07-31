@@ -1,9 +1,8 @@
 
-Copyright © 2014  Music Technology Group - Universitat Pompeu Fabra
+Copyright ï¿½ 2017  Music Technology Group - Universitat Pompeu Fabra
 
-NAME: AlignmentEvaluation
-
-DESCRIPTION 
+AlignmentEvaluation
+==============================
 
 A tool for evaluation of absolute alignment error of tokens.
 Done to evaluate results of a system for lyrics-2-audio alignment on different levels (a token could be phoneme, word or phrase - a group of words )
@@ -20,7 +19,7 @@ Algorithm is token-identities-agnostic, e.g. it does not try to match token-IDs 
 
 Note that if a single boundary is detected between two tokens it is considered once as end of preceding annotation token  and beginning of following annotation token, which makes the metric rather strict
 
-------------------------------
+
 As well there is a module to convert automatically the decoded result to Praat's TextGrid format.
 This enables the  visualization of the decoding result together with the groundTruth in Praat:
 see PraatVisualiser.openTextGridInPraatopenTextGridInPraat : opens the text Grid in Praat
@@ -30,6 +29,7 @@ Enjoy!
  
  
 LICENSE:
+-------------------
 AlignmentEvaluation is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation (FSF), either version 3 of the License, or (at your option) any later version.
 
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
@@ -37,22 +37,23 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/
 
 CITATION: 
+----------------------
 please cite 
 Dzhambazov, G., Senturk S., Serra X. - Automatic lyrics-to-audio alignment in classical Turkish music
 bibTex: http://mtg.upf.edu/biblio/export/bibtex/2965
 
 BUILD INSTRUCTIONS:
-
-depends on 
-* utilsLyrics
-git clone https://github.com/georgid/utilsLyrics.git
+- install [mir_eval](https://github.com/craffel/mir_eval)
+- git clone https://github.com/georgid/AlignmentEvaluation
 
 
 
+USAGE: 
 ---------------------------------------- 
-EXAMPLE USAGE: 
 
-see: main method of WordLevelEvlauator
+For .lab file see 
+test.EvalMetricsTest.evalAccuracy_TextGird_test()
+
 
 if decoded result is:
  

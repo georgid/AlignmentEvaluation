@@ -14,10 +14,6 @@ if parentDir not in sys.path:
       sys.path.append(parentDir)
 pathUtils = os.path.join(parentDir, 'utilsLyrics')
 
-def _evalAccuracy_test():
-    '''
-    test  evalAccuracy evaluation script  makes sense
-    '''
     
     
 
@@ -47,7 +43,7 @@ def evalAccuracyTest_jingju_old():
 
     
     whichTier=3
-    durationCorrect, totalLength  = _evalAccuracy(annotationURI, detectedTokenList,whichTier , startIdx, endIdx)
+    durationCorrect, totalLength  = _evalAccuracy(annotationURI, detectedTokenList, whichTier , startIdx, endIdx)
     print durationCorrect
     print totalLength
     print durationCorrect/totalLength
