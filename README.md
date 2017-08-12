@@ -45,14 +45,26 @@ bibTex: http://mtg.upf.edu/biblio/export/bibtex/2965
 BUILD INSTRUCTIONS:
 - install [mir_eval](https://github.com/craffel/mir_eval)
 - git clone https://github.com/georgid/AlignmentEvaluation
-
+- cd <path_to_installed AlignmentEvaluation>
+- python setup.py install
 
 
 USAGE: 
 ---------------------------------------- 
 
-For .lab file see 
+=== For .lab file === 
+
+[test.EvalMetricsTest.evalError_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L56)
+
+[test.EvalMetricsTest.evalAccuracy_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L39)
+
+
+
+=== For .TextGrid file === 
+
 test.EvalMetricsTest.evalAccuracy_TextGird_test()
+
+test.EvalMetricsTest.eval_error_textGrid_test()
 
 
 if decoded result is:
