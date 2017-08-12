@@ -9,7 +9,7 @@ import os
 import logging
 from align_eval.PraatVisualiser import openTextGridInPraat, PATH_TO_PRAAT
 from align_eval.PraatVisualiser import tokenList2TabFile
-from align_eval.WordLevelEvaluator import loadDetectedTokenListFromMlf
+from align_eval.ErrorEvaluator import loadDetectedTokenListFromMlf
 
 #used to open detected result only in TextGrid. after alignemnt algorithm is run.
 

@@ -19,7 +19,7 @@ pathUtils = os.path.join(parentDir, 'utilsLyrics')
 
 def evalAccuracyTest_jingju_old():
 
-######### for test logic see WordLevelEvaluator instead
+######### for test logic see ErrorEvaluator instead
 
     PATH_TEST_DATASET = '../example/'
       

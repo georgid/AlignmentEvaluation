@@ -3,8 +3,8 @@ Created on Feb 24, 2015
 
 @author: joro
 '''
-from align_eval.WordLevelEvaluator import stripNonLyricsTokens,\
-    loadDetectedTokenListFromMlf
+from align_eval.ErrorEvaluator import stripNonLyricsTokens,\
+    loadDetectedTokenListFromMlf, check_num_tokens
 import logging
 import sys
 import os
@@ -37,26 +37,9 @@ def evalAccuracy(annotationURI, outputHTKPhoneAlignedURI, whichTier, startIdx, e
 
 
 
-def split_into_tokens(tokens):
-    '''
-    split phrases of tokens by white spaces into words 
-    '''
-    
-    idx_txt = -1 # assume the word is the last entry of a token (after begin timestamp etc.)
-    num_tokens_in_phrase = []
-    for currAnnoTsAndToken in tokens:
-        if  type(currAnnoTsAndToken) == str:
-            txt = currAnnoTsAndToken
-        else:
-            txt = currAnnoTsAndToken[idx_txt]
-        txt = txt.strip()
-        subtokens = txt.split()
-        numWordsInPhrase = len(subtokens)
-        if numWordsInPhrase == 0:
-            sys.exit('token (phrase) with no subtokens (words) in annotation file!')
-        num_tokens_in_phrase.append(numWordsInPhrase)
-    
-    return num_tokens_in_phrase, currAnnoTsAndToken
+
+
+
 
 def _evalAccuracy(reference_token_list, detected_Token_List, finalTsAnno, initialTimeOffset=0, reference_labels=None):
     '''
@@ -65,55 +48,40 @@ def _evalAccuracy(reference_token_list, detected_Token_List, finalTsAnno, initia
     Does not check token identities, but proceeds successively one-by-one  
     Make sure number of detected tokens not counting special tokens (sp, sil ) is same as number of annotated tokens 
 
-    token: could be phoneme (consists of one subtoken -phoneme itself),
-    word (consists of one subtoken -word itself) or 
-    phrase (consist of subtokens words ) 
+    token: could be 
+    - phoneme (consists of one subtoken -phoneme itself),
+    - word (consists of one subtoken -word itself) or 
+    - phrase (consist of subtokens words ) 
 
 
     Parameters
     -------------- 
     detected_Token_List: list [[]]
-        a list of triples: (startTs, endTs, wordID) 
+        a list of triples: (startTs, endTs, word) detections 
     
-    reference_token_list: string
-        URI of Praat annotaiton textgrid file
+    reference_token_list: list [[]]
+        a list of triples: (startTs, endTs, word) reference annotations
     
+    finalTsAnno: float
+        timestamps of last annotated token (e.g. last timestamp) 
+        
     
     '''
     
     # WoRKAROUND. because currenty I dont store final sil in detected textFile .*Aligned 
 #     finalTsDetected = finalTsAnno
 
-    durationCorrect = 0;
 
-    if len(reference_token_list) == 0:
-        logging.warn(reference_token_list + ' is empty! Check code')
-        return durationCorrect
-
-    if len(detected_Token_List) == 0:
-        logging.warn(' detected token list is empty! Check code')
-        return durationCorrect
-    
-    ##########  divide phrases into tokens
-    if reference_labels != None: # labels of reference tokens given separately 
-        num_tokens_in_phrase, currAnnoTsAndToken = split_into_tokens(reference_labels)
-    else: # labels should be the last field of reference_token_list
-        num_tokens_in_phrase, currAnnoTsAndToken = split_into_tokens(reference_token_list)
-    
-
-    ##### check that annotation and detection have same number of tokens
-    if sum(num_tokens_in_phrase) != len(detected_Token_List):
-            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible \n Detection: {} \n Annotation: {}'\
-                     .format( sum(num_tokens_in_phrase), len(detected_Token_List), detected_Token_List, reference_token_list))
+    currAnnoTsAndToken, num_tokens_in_phrase = check_num_tokens(reference_token_list, detected_Token_List, reference_labels)
     
     # initialize initial time offset
     durationCorrect = min(float(reference_token_list[0][0]), detected_Token_List[0][0]) - initialTimeOffset
-    # evaluate: loop in tokens of gr truth annotation
 
     #     finalTsDetected = detectedTokenList[-1][0][1] # a word has one syllable
     finalTsDetected = detected_Token_List[-1][1]
 
     currentWordNumber = 0
+    # evaluate: loop in tokens of gr truth reference annotation
     for idx, currAnnoTsAndToken in enumerate(reference_token_list):
         
         durationCorrectCurr = calcCorrect(detected_Token_List, reference_token_list, \

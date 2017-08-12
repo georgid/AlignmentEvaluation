@@ -6,13 +6,56 @@ in order to reduce inter-porject dependency, please if you modify them, make sur
 @author: joro
 '''
 import codecs
-import numpy
+import numpy as np
+import warnings
 
 import logging
+from mir_eval.io import load_delimited
+from mir_eval import util
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 logger.setLevel(logging.INFO)
 
+
+def get_duration_audio(filename):
+    '''
+    get duration in seconds of .wav file 
+    '''
+    import wave
+    import contextlib
+    with contextlib.closing(wave.open(filename,'r')) as f:
+        frames = f.getnframes()
+        rate = f.getframerate()
+        duration = frames / float(rate)
+        return duration
+
+
+def load_labeled_intervals(filename, delimiter=r'\s+'):
+    '''
+    overwrites https://github.com/craffel/mir_eval/blob/master/mir_eval/io.py#L208
+    in order to be able to change the converters arguments of load_delimieted  to handle , instead of . in floating point vals 
+    '''
+    # Use our universal function to load in the events
+    
+    converter_comma = lambda val: float(val.replace(',', '.')) # replace ',' by '.'
+    try:
+        starts, ends, labels = load_delimited(filename, [converter_comma, converter_comma, str],
+                                          delimiter)
+    except Exception: # only start times given
+        starts,  labels = load_delimited(filename, [converter_comma, str],
+                                          delimiter)
+        filename_wav = filename[:-9] +'.wav' 
+        duration = get_duration_audio(filename_wav) # generate end timestamps from following start timestamps
+        ends = starts[1:]; ends.append(duration) 
+    # Stack into an interval matrix
+    intervals = np.array([starts, ends]).T
+    # Validate them, but throw a warning in place of an error
+    try:
+        util.validate_intervals(intervals)
+    except ValueError as error:
+        warnings.warn(error.args[0])
+
+    return intervals, labels
 
 
 def loadTextFile( pathToFile):
@@ -39,8 +82,8 @@ def writeListOfListToTextFile(listOfList,headerLine, pathToOutputFile, toFlip=Fa
     
     # flip (transpose) matrix
     if toFlip:
-        a = numpy.rot90(listOfList)
-        listOfList = numpy.flipud(a)
+        a = np.rot90(listOfList)
+        listOfList = np.flipud(a)
     
     for listLine in listOfList:
         
@@ -64,13 +107,13 @@ def getMeanAndStDevError(alignmentErrors):
     statistics for an array
     '''
         
-    # convert to numpy array
+    # convert to np array
     absalignmentErrors = [0] * len(alignmentErrors)
     for index, alError in enumerate(alignmentErrors):
         absalignmentErrors[index] = abs(alError)
     
-    mean = numpy.round(numpy.mean(absalignmentErrors), decimals=2)
-    median = numpy.round( numpy.median(absalignmentErrors), decimals=2)
-    stDev = numpy.round( numpy.std(alignmentErrors), decimals=2)
+    mean = np.round(np.mean(absalignmentErrors), decimals=2)
+    median = np.round( np.median(absalignmentErrors), decimals=2)
+    stDev = np.round( np.std(alignmentErrors), decimals=2)
     
     return mean, stDev, median
