@@ -17,11 +17,11 @@ Extendable to the evaluation for any token-based alignment (e.g. if a token is a
 
 Supported detected file formats :  
 - mlf format of [htk](htk.eng.cam.ac.uk/) 
-- lab format  of tuples <begin timestamp> (<end timestamp>) <tokenID>. End timestamp is optional, not considered.
+- lab format  of tuples begin_timestamp, (end_timestamp), tokenID. End timestamp is optional, not considered.
 
 Supported annotation file formats: 
 - TextGrid of [Praat](www.praat.org/) 
-- lab format (see above). When exported from many tools among which e.g. [Audacity](http://www.audacityteam.org/home/). When end time stamps are provided (<begin timestamp>, <end timestamp>, <tokenID>), they are ingored.
+- lab format (see above). When exported from many tools among which e.g. [Audacity](http://www.audacityteam.org/home/). When end time stamps are provided (begin_timestamp, end_timestamp, tokenID), they are ingored.
 
  
 
@@ -42,7 +42,7 @@ BUILD INSTRUCTIONS:
 USAGE: 
 ---------------------------------------- 
 
-===For .lab file=== 
+### For .lab file 
 
 [test.EvalMetricsTest.evalError_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L56)
 
@@ -51,7 +51,7 @@ USAGE:
 
 
 
-===For .TextGrid file=== 
+### For .TextGrid file 
 
 test.EvalMetricsTest.evalAccuracy_TextGird_test()
 
@@ -119,6 +119,6 @@ You should have received a copy of the GNU General Public License along with thi
 CITATION: 
 ----------------------
 please cite 
-Dzhambazov, G., Senturk S., Serra X. - Automatic lyrics-to-audio alignment in classical Turkish music
-bibTex: http://mtg.upf.edu/biblio/export/bibtex/2965
+Dzhambazov, G.,  - Knowledge-based Probabilistic Modeling for Tracking Lyrics in Music Audio Signals, PhD Thesis
+
 
