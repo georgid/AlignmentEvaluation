@@ -2,8 +2,8 @@
 Created on Feb 5, 2014
 
 @attention: not working just put here if SonicVis needed
-Converts from format: tuple (phoneme and timestamp) 
-(as used by  sonic visualizer ) to mlf. 
+Converts from .lab format: tuple (phoneme and timestamp) 
+(as used e.g. by  sonic visualizer ) to mlf. 
 Currently adjusted according to syllablingDB
 @author: joro
 '''
