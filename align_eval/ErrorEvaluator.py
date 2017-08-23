@@ -172,12 +172,12 @@ def split_into_tokens(annotation_tokens):
 
 
 
-def _evalAlignmentError(reference_token_list, detected_Token_List, whichLevel, reference_labels=None):
+def _evalAlignmentError(reference_token_list, detected_Token_List, whichLevel, reference_labels=None, use_end_ts=False):
     '''
     Calculate alignment errors. Does not check token identities, but proceeds successively one-by-one  
     Make sure number of detected tokens (wihtout counting sp, sil ) is same as number of annotated tokens 
 
-    for description see related method: AccuracyEvaluator._evalAccuracy
+    for description see related method: PercentageCorrectEvaluator._evalPercentageCorrect
 
     '''
     alignmentErrors = []
@@ -196,8 +196,10 @@ def _evalAlignmentError(reference_token_list, detected_Token_List, whichLevel, r
         
         beginAlignmentError, endAlignmentError = calcErrorBeginAndEndTs(detected_Token_List, currAnnoTsAndToken, current_num_tokens, num_tokens_in_phrase[idx])        
         
+        
         alignmentErrors.append(beginAlignmentError)
-        alignmentErrors.append(endAlignmentError)
+        if use_end_ts: # end timestamp of each token considered, too. this makes sense when inter-word silences/instrumentals are present   
+            alignmentErrors.append(endAlignmentError)
         
         #### UPDATE: proceed in detection the number of subtokens in current token          
         current_num_tokens += num_tokens_in_phrase[idx]

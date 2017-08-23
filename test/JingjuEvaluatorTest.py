@@ -4,7 +4,7 @@ Created on Jun 30, 2015
 @author: joro
 '''
 import os
-from align_eval.AccuracyEvaluator import _evalAccuracy
+from align_eval.AccuracyEvaluator import _evalPercentageCorrect
 import sys
 
 # file parsing tools as external lib 
@@ -43,7 +43,7 @@ def evalAccuracyTest_jingju_old():
 
     
     whichTier=3
-    durationCorrect, totalLength  = _evalAccuracy(annotationURI, detectedTokenList, whichTier , startIdx, endIdx)
+    durationCorrect, totalLength  = _evalPercentageCorrect(annotationURI, detectedTokenList, whichTier , startIdx, endIdx)
     print durationCorrect
     print totalLength
     print durationCorrect/totalLength

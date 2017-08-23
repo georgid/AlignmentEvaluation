@@ -12,6 +12,7 @@ import warnings
 import logging
 from mir_eval.io import load_delimited
 from mir_eval import util
+import os
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
 logger.setLevel(logging.INFO)
@@ -38,14 +39,17 @@ def load_labeled_intervals(filename, delimiter=r'\s+'):
     # Use our universal function to load in the events
     
     converter_comma = lambda val: float(val.replace(',', '.')) # replace ',' by '.'
-    try:
+    try: # start times and end times given
         starts, ends, labels = load_delimited(filename, [converter_comma, converter_comma, str],
                                           delimiter)
-    except Exception: # only start times given
+    except Exception, e: # only start times given
         starts,  labels = load_delimited(filename, [converter_comma, str],
                                           delimiter)
-        filename_wav = filename[:-9] +'.wav' 
-        duration = get_duration_audio(filename_wav) # generate end timestamps from following start timestamps
+        filename_wav = filename[:-9] +'.wav'  # remove .refs.lab and replace it with .wav. TODO make this logic clearer 
+        if os.path.isfile(filename_wav):
+            duration = get_duration_audio(filename_wav) # generate end timestamps from following start timestamps
+        else:
+            duration = starts[-1] + 1 # fake last word to be 1 sec long
         ends = starts[1:]; ends.append(duration) 
     # Stack into an interval matrix
     intervals = np.array([starts, ends]).T

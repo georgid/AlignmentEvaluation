@@ -6,9 +6,10 @@ AlignmentEvaluation
 
 A tool for computing common alignment metrics of tokens (a token could be at different granularity level: a phoneme, word or phrase - a group of words ). Done to evaluate results of a system for lyrics-to-audio alignment on different token levels. 
 Three common metrics are implemented: 
-1) mean average alignment error
-2) accuracy 
-3) accuracy with tolerance 
+1) mean average absolute error/deviation
+2) percentage of correct segments 
+3) accuracy with tolerance window 
+
 For definition of the metrics see Chapter 2.2.1 from [this thesis](http://compmusic.upf.edu/phd-thesis-georgi)
 
 The algorithm considers only begin timestamps of each token. It is token-identities-agnostic, e.g. it does not try to match token-IDs between detected result and annotation, but proceeds successively one-by-one.  
@@ -17,11 +18,11 @@ Extendable to the evaluation for any token-based alignment (e.g. if a token is a
 
 Supported detected file formats :  
 - mlf format of [htk](htk.eng.cam.ac.uk/) 
-- lab format  of tuples begin_timestamp, (end_timestamp), tokenID. End timestamp is optional, not considered.
+- lab format  of tuples begin_timestamp, end_timestamp, tokenID. If end timestamps are not known, tuples are begin_timestamp, tokenID are acceptable, but the percentage of correct segments might degrade for a dataset with annotated end timestamps. 
 
 Supported annotation file formats: 
 - TextGrid of [Praat](www.praat.org/) 
-- lab format (see above). When exported from many tools among which e.g. [Audacity](http://www.audacityteam.org/home/). When end time stamps are provided (begin_timestamp, end_timestamp, tokenID), they are ingored.
+- lab format (see above). When exported from many tools among which e.g. [Audacity](http://www.audacityteam.org/home/). End time stamps are important only for the metric percentage of correct segments. They are ingored for the other two metrics.
 
  
 
@@ -44,10 +45,11 @@ USAGE:
 
 ### For .lab file 
 
-[test.EvalMetricsTest.evalError_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L56)
+- mean average absolute error/deviation: [test.EvalMetricsTest.evalError_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L55)
 
-[test.EvalMetricsTest.evalAccuracy_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L39)
+- percentage of correct segments  : [test.EvalMetricsTest.evalPercentageCorrect_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L39)
 
+- accuracy with tolerance window  : [test.EvalMetricsTest.evalAccuracy_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L66)
 
 
 

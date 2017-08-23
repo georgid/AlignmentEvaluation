@@ -16,15 +16,15 @@ parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(sys.ar
 # sys.path.append(pathUtils )
 # from utilsLyrics.Utilz import  readListOfListTextFile
 
-def evalAccuracy(annotationURI, outputHTKPhoneAlignedURI, whichTier, startIdx, endIdx ):
+def evalPercentageCorrect(annotationURI, outputHTKPhoneAlignedURI, whichTier, startIdx, endIdx ):
     '''
-    Wrapper around _evalAccuracy() for txt file outputHTKPhoneAlignedURI
+    Wrapper around _evalPercentageCorrect() for txt file outputHTKPhoneAlignedURI
     
     Parameters
     --------------
     outputHTKPhoneAlignedURI: detected timestamps in htk's mlf format 
     
-    other parameters same as in _evalAccuracy
+    other parameters same as in _evalPercentageCorrect
     '''
     
     detectedTokenList = loadDetectedTokenListFromMlf( outputHTKPhoneAlignedURI, whichTier )
@@ -32,7 +32,7 @@ def evalAccuracy(annotationURI, outputHTKPhoneAlignedURI, whichTier, startIdx, e
     annotationTokenList, detectedTokenList, finalTsAnno,  initialTimeOffset = \
      stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx)
     
-    durationCorrect, totalDuration = _evalAccuracy(annotationTokenList, detectedTokenList, finalTsAnno,  initialTimeOffset)
+    durationCorrect, totalDuration = _evalPercentageCorrect(annotationTokenList, detectedTokenList, finalTsAnno,  initialTimeOffset)
     return  durationCorrect, totalDuration 
 
 
@@ -41,12 +41,12 @@ def evalAccuracy(annotationURI, outputHTKPhoneAlignedURI, whichTier, startIdx, e
 
 
 
-def _evalAccuracy(reference_token_list, detected_Token_List, finalTsAnno, initialTimeOffset=0, reference_labels=None):
+def _evalPercentageCorrect(reference_token_list, detected_Token_List, finalTsAnno, initialTimeOffset=0, reference_labels=None):
     '''
-    Calculate accuracy as suggested in
+    Calculate percentage of duration of correctly aligned tokens as suggested in
     Fujihara: LyricSynchronizer: Automatic Synchronization System Between Musical Audio Signals and Lyrics
     Does not check token identities, but proceeds successively one-by-one  
-    Make sure number of detected tokens not counting special tokens (sp, sil ) is same as number of annotated tokens 
+    Make sure number of detected tokens (not counting special tokens sp, sil ) is same as number of annotated tokens 
 
     token: could be 
     - phoneme (consists of one subtoken -phoneme itself),

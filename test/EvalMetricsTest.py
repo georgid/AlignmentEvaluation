@@ -14,7 +14,7 @@ from align_eval.ErrorEvaluator import _evalAlignmentError, tierAliases,\
     stripNonLyricsTokens
 from align_eval.PraatVisualiser import ANNOTATION_EXT
 import os
-from align_eval.AccuracyEvaluator import _evalAccuracy
+from align_eval.PercentageCorrectEvaluator import _evalPercentageCorrect
 import mir_eval
 # import mir_eval.display
 import matplotlib.pyplot as plt
@@ -36,26 +36,25 @@ PATH_TEST_DATASET = os.path.join(project_dir, 'example/')
 #      
     ############### 2  example with detected tsv file
 
-def evalAccuracy_lab_test():
+def evalPercentageCorrect_lab_test():
     '''
-    test accuracy of alignment with loading the .lab files 
+    test the percentage of duration of correctly aligned tokens with loading the .lab files 
     '''
     
     ref_intervals, detected_intervals, ref_labels = load_ref_and_detections()
     
     initialTimeOffset_refs = ref_intervals[0][0]
     finalts_refs = ref_intervals[-1][1]
-    durationCorrect, totalLength  = _evalAccuracy(ref_intervals, detected_intervals, 
+    durationCorrect, totalLength  = _evalPercentageCorrect(ref_intervals, detected_intervals, 
                                                   finalts_refs,  initialTimeOffset_refs, ref_labels )
-    print "Alignment accuracy: ",  durationCorrect / totalLength
-
+    print "Alignment percentage correct: ",  durationCorrect / totalLength
 
 
 
 
 def evalError_lab_test():
     '''
-    test error (in seconds) of alignment with loading the .lab files 
+    test mean average error/displacement (in seconds) of alignment with loading the .lab files 
     '''
     
     ref_intervals, detected_intervals, ref_labels = load_ref_and_detections()
@@ -64,20 +63,44 @@ def evalError_lab_test():
     mean, stDev, median = getMeanAndStDevError(alignmentErrors)
     print "Alignment error mean : ", mean, "Alignment error st. dev: " , stDev
     
+def evalAccuracy_lab_test():
+    '''
+    test the accuracy of tokens with a tolerance window tau loading the .lab files 
+    '''
+    
+    ref_intervals, detected_intervals, ref_labels = load_ref_and_detections()
+    
+#     initialTimeOffset_refs = ref_intervals[0][0]
+#     finalts_refs = ref_intervals[-1][1]
+    
+    # TODO:
+    accuracy = 1
+#     accuracy  = _evalAccuracy(ref_intervals, detected_intervals, 
+#                                                   finalts_refs,  initialTimeOffset_refs, ref_labels )
+    
+    print "Alignment accuracy: ",  accuracy
+
   
 def load_ref_and_detections():
     '''
-    convenience method
+    convenience method. You can test with one example audio and annotation of each of the two datasets
     '''
     plt.figure()
-    #     refs_URI = os.path.join(PATH_TEST_DATASET, 'words.refs.lab') # generic data
-    #     detected_URI = os.path.join(PATH_TEST_DATASET, 'words.detected.lab')
     
-#     refs_URI = os.path.join(PATH_TEST_DATASET, 'umbrella_words.refs.lab') # for Hansen's dataset
-#     detected_URI = os.path.join(PATH_TEST_DATASET, 'umbrella_words.refs.lab') # as if reference were detections
+    ############# generic data    
+#     refs_URI = os.path.join(PATH_TEST_DATASET, 'words.refs.lab')
+#     detected_URI = os.path.join(PATH_TEST_DATASET, 'words.detected.lab')
     
-    refs_URI = os.path.join(PATH_TEST_DATASET, 'Muse.GuidingLight.refs.lab') # for Mauch's dataset
-    detected_URI = os.path.join(PATH_TEST_DATASET, 'Muse.GuidingLight.refs.lab') # as if reference were detections
+#     refs_URI = os.path.join(PATH_TEST_DATASET, 'words.onsets.refs.lab')
+#     detected_URI = os.path.join(PATH_TEST_DATASET, 'words.onsets.detected.lab')
+    
+    ############ for Hansen's dataset
+    refs_URI = os.path.join(PATH_TEST_DATASET, 'umbrella_words.refs.lab') # for Hansen's dataset
+    detected_URI = os.path.join(PATH_TEST_DATASET, 'umbrella_words.refs.lab') # as if reference were detections
+    
+    ############ for Mauch's dataset
+#     refs_URI = os.path.join(PATH_TEST_DATASET, 'Muse.GuidingLight.refs.lab') 
+#     detected_URI = os.path.join(PATH_TEST_DATASET, 'Muse.GuidingLight.refs.lab') # as if reference were detections
     
     ref_intervals, ref_labels = load_labeled_intervals(refs_URI)
     detected_intervals, detected_labels = load_labeled_intervals(detected_URI)
@@ -85,7 +108,7 @@ def load_ref_and_detections():
     return ref_intervals, detected_intervals, ref_labels
     
 
-def evalAccuracy_TextGird_test():
+def evalPercentageCorrect_TextGird_test():
        
     audioName = '05_Semahat_Ozdenses_-_Bir_Ihtimal_Daha_Var_0_zemin_from_69_5205_to_84_2'
     annotationURI = os.path.join(PATH_TEST_DATASET,  audioName + ANNOTATION_EXT)
@@ -103,7 +126,7 @@ def evalAccuracy_TextGird_test():
     annotationTokenList, detected_token_list, finalTsAnno, initialTimeOffset = \
      stripNonLyricsTokens(annotationURI, detected_token_list, tierAliases.phrases , startIndex, endIndex)
     
-    durationCorrect, totalLength  = _evalAccuracy(annotationTokenList, detected_token_list, 
+    durationCorrect, totalLength  = _evalPercentageCorrect(annotationTokenList, detected_token_list, 
                                                   finalTsAnno,  initialTimeOffset )
     print durationCorrect / totalLength
 
@@ -136,7 +159,10 @@ if __name__ == '__main__':
     evalError_lab_test()
 
 
-# test percentage of correct segments (accuracy) 
-#     evalAccuracy_TextGird_test()    
-    evalAccuracy_lab_test()
+# test percentage of correct segments
+#     evalPercentageCorrect_TextGird_test()    
+    evalPercentageCorrect_lab_test()
     
+# test accuracy with tolerance t = 1s
+
+    evalAccuracy_lab_test()
