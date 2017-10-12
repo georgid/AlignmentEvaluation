@@ -22,7 +22,7 @@ parentDir = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file
 if parentDir not in sys.path:
     sys.path.append(parentDir)
 
-from src.onsets.OnsetDetector import tsToFrameNumber
+from src.utilsLyrics.Utilz import tsToFrameNumber
 from src.parse.TextGrid_Parsing import TextGrid2WordList, readNonEmptyTokensTextGrid,\
     divideIntoSentencesFromAnnoWithSil, tierAliases
 from _PhonemeBase import PhonemeBase

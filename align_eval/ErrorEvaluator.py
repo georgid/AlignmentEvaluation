@@ -267,7 +267,9 @@ def check_num_tokens(reference_token_list, detected_Token_List, reference_labels
         
     ##### check that annotation and detection have same number of tokens
     if sum(num_tokens_in_phrase) != len(detected_Token_List):
-        sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible \n Detection: {} \n Annotation: {}'.format(sum(num_tokens_in_phrase), len(detected_Token_List), detected_Token_List, reference_token_list))
+#         sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible \n Detection: {} \n Annotation: {}'.format(sum(num_tokens_in_phrase), len(detected_Token_List), detected_Token_List, reference_token_list))
+        sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format(sum(num_tokens_in_phrase), len(detected_Token_List)))
+
     return currAnnoTsAndToken, num_tokens_in_phrase
 
 

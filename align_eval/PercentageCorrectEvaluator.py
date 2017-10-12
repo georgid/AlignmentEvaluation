@@ -41,12 +41,12 @@ def evalPercentageCorrect(annotationURI, outputHTKPhoneAlignedURI, whichTier, st
 
 
 
-def _evalPercentageCorrect(reference_token_list, detected_Token_List, finalTsAnno, initialTimeOffset=0, reference_labels=None):
+def _evalPercentageCorrect(reference_token_list, detected_Token_List, finalTsAnno, initialTimeOffset_refs=0, reference_labels=None):
     '''
     Calculate percentage of duration of correctly aligned tokens as suggested in
     Fujihara: LyricSynchronizer: Automatic Synchronization System Between Musical Audio Signals and Lyrics
     Does not check token identities, but proceeds successively one-by-one  
-    Make sure number of detected tokens (not counting special tokens sp, sil ) is same as number of annotated tokens 
+    Makes sure number of detected tokens (not counting special tokens sp, sil ) is same as number of annotated tokens 
 
     token: could be 
     - phoneme (consists of one subtoken -phoneme itself),
@@ -74,9 +74,7 @@ def _evalPercentageCorrect(reference_token_list, detected_Token_List, finalTsAnn
 
     currAnnoTsAndToken, num_tokens_in_phrase = check_num_tokens(reference_token_list, detected_Token_List, reference_labels)
     
-    # initialize initial time offset
-    durationCorrect = min(float(reference_token_list[0][0]), detected_Token_List[0][0]) - initialTimeOffset
-
+    durationCorrect = 0
     #     finalTsDetected = detectedTokenList[-1][0][1] # a word has one syllable
     finalTsDetected = detected_Token_List[-1][1]
 
@@ -93,7 +91,7 @@ def _evalPercentageCorrect(reference_token_list, detected_Token_List, finalTsAnn
     
     
     
-    totalLength = max(float(finalTsAnno), float(finalTsDetected)   )       -       initialTimeOffset
+    totalLength = float(finalTsAnno) - initialTimeOffset_refs #  total length of annotated part, because non-vocal regions at end and beginning are not considered in results
     return  durationCorrect, totalLength 
 
 
@@ -124,7 +122,7 @@ def calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, idx, cur
             logging.warn("currEndDetected {} > finallTsAnno {}".format(currEndDetected, finallTsAnno))
             currEndDetected = finallTsAnno
         
-        correct += max(0,min(finallTsAnno,finalTsDetected) - max(currEndAnno, currEndDetected))
+        correct += max(0, min(finallTsAnno,finalTsDetected) - max(currEndAnno, currEndDetected))
         
     return correct
 

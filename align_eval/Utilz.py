@@ -105,6 +105,23 @@ def writeListOfListToTextFile(listOfList,headerLine, pathToOutputFile, toFlip=Fa
     logger.info ("successfully written file: \n {} \n".format( pathToOutputFile))
 
 
+def writeCsv(fileURI, list_, withListOfRows=1):
+    '''
+    TODO: move to utilsLyrics
+    '''
+    from csv import writer
+    fout = open(fileURI, 'wb')
+    w = writer(fout)
+    print 'writing to csv file {}...'.format(fileURI)
+    for row in list_:
+        if withListOfRows:
+            w.writerow(row)
+        else:
+            tuple_note = [row.onsetTime, row.noteDuration]
+            w.writerow(tuple_note)
+    
+    fout.close()
+
 
 def getMeanAndStDevError(alignmentErrors):
     '''
