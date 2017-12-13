@@ -45,7 +45,7 @@ USAGE:
 
 ### For .lab file 
 
-python (eval.py)[https://github.com/georgid/AlignmentEvaluation/blob/master/align_eval/eval.py] 
+python [eval.py](https://github.com/georgid/AlignmentEvaluation/blob/master/align_eval/eval.py) 
 <path to file with reference word boundaries> <path to file with detected word boundaries>
 This reports both the mean average error and the percentage of correct segments
 
