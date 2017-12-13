@@ -105,12 +105,15 @@ def writeListOfListToTextFile(listOfList,headerLine, pathToOutputFile, toFlip=Fa
     logger.info ("successfully written file: \n {} \n".format( pathToOutputFile))
 
 
-def writeCsv(fileURI, list_, withListOfRows=1):
+def writeCsv(fileURI, list_, withListOfRows=1, append=0):
     '''
     TODO: move to utilsLyrics
     '''
     from csv import writer
-    fout = open(fileURI, 'wb')
+    if append:
+        fout = open(fileURI, 'ab')
+    else:
+        fout = open(fileURI, 'wb')
     w = writer(fout)
     print 'writing to csv file {}...'.format(fileURI)
     for row in list_:
@@ -133,6 +136,7 @@ def getMeanAndStDevError(alignmentErrors):
     for index, alError in enumerate(alignmentErrors):
         absalignmentErrors[index] = abs(alError)
     
+    # calculate with numpy
     mean = np.round(np.mean(absalignmentErrors), decimals=2)
     median = np.round( np.median(absalignmentErrors), decimals=2)
     stDev = np.round( np.std(alignmentErrors), decimals=2)

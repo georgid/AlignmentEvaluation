@@ -70,5 +70,5 @@ def main_eval_all_files(argv):
     writeCsv(os.path.join(output_URI, 'results.csv'), results)
     
 if __name__ == '__main__':
-#     main_eval_one_file(sys.argv)
-    main_eval_all_files(sys.argv)
+    main_eval_one_file(sys.argv)
+    # main_eval_all_files(sys.argv)
