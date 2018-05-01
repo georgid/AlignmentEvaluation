@@ -13,11 +13,11 @@ projDir = os.path.join(os.path.dirname(__file__), os.path.pardir)
 if projDir not in sys.path:
     sys.path.append(projDir)
 
-from align_eval.PercentageCorrectEvaluator import _evalPercentageCorrect
+from align_eval.PercentageCorrectEvaluator import _eval_percentage_correct
 from align_eval.Utilz import load_labeled_intervals, getMeanAndStDevError,\
     writeCsv
 from parse.TextGrid_Parsing import tierAliases
-from align_eval.ErrorEvaluator import _evalAlignmentError
+from align_eval.ErrorEvaluator import _eval_alignment_error
 
 
 
@@ -28,15 +28,15 @@ def eval_all_metrics_lab(refs_URI, detected_URI):
     ref_intervals, ref_labels = load_labeled_intervals(refs_URI)
     detected_intervals, detected_labels = load_labeled_intervals(detected_URI)
     
-    alignmentErrors = _evalAlignmentError(ref_intervals, detected_intervals, tierAliases.phrases, ref_labels)
+    alignmentErrors = _eval_alignment_error(ref_intervals, detected_intervals, tierAliases.phrases, ref_labels)
     mean, stDev, median = getMeanAndStDevError(alignmentErrors)
 #     print "Alignment error mean : ", mean, "Alignment error st. dev: " , stDev
     
     ###### percentage correct
     initialTimeOffset_refs = ref_intervals[0][0]
     finalts_refs = ref_intervals[-1][1]
-    durationCorrect, totalLength  = _evalPercentageCorrect(ref_intervals, detected_intervals, 
-                                                  finalts_refs,  initialTimeOffset_refs, ref_labels )
+    durationCorrect, totalLength  = _eval_percentage_correct(ref_intervals, detected_intervals,
+                                                             finalts_refs, initialTimeOffset_refs, ref_labels)
     percentage_correct = durationCorrect / totalLength
     return mean, percentage_correct
 

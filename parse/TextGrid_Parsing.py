@@ -1,6 +1,6 @@
 #! /usr/bin/python
 # -*- coding: utf-8 -*-
-import textgrid as tgp
+import parse.textgrid as tgp
 import sys, os
 import logging
 # from onsets.OnsetDetector import writeCsv
@@ -111,14 +111,14 @@ def TextGrid2WordList(textgrid_file, whichTier=2):
         if int(whichTier) >= len(tier_names):
             sys.exit("tiers are {} but requested tier {}".format(len(tier_names),int(whichTier) ))
         if tierName ==  tier_names[int(whichTier)]:	#iterating over tiers and selecting the one specified
-			isTierFound = 1
-			tier_details = tier.make_simple_transcript();		#this function parse the file nicely and return cool tuples
-			
-			for line in tier_details:
-				beginTsAndWordList.append([float(line[0]), float(line[1]), line[2]])
+            isTierFound = 1
+            tier_details = tier.make_simple_transcript()		#this function parse the file nicely and return cool tuples
+
+            for line in tier_details:
+                beginTsAndWordList.append([float(line[0]), float(line[1]), line[2]])
     if not isTierFound:
-		raise Exception('tier in file {0} might not be named correctly. Name it {1}' .format(textgrid_file,  tier_names[whichTier]))
-    return beginTsAndWordList		
+        raise Exception('tier in file {0} might not be named correctly. Name it {1}' .format(textgrid_file,  tier_names[whichTier]))
+    return beginTsAndWordList
 
     
 def divideIntoSentencesFromAnnoWithSil(annotationURI,  high_level_tier_name, low_level_tier_name):
@@ -209,7 +209,7 @@ def _findBeginEndIndices(lowLevelTokensList, lowerLevelTokenPointer, highLevelBe
 def toChronTest(textgrid_file):
     par_obj = tgp.TextGrid.load(textgrid_file)    #loading the object    
     chronFile = tgp.TextGrid.to_chron(par_obj)
-    print chronFile
+    print(chronFile)
 
 
 def testreadNonEmptyTokensTextGrid():

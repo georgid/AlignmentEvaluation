@@ -34,7 +34,7 @@ import logging
 
 ## the above lines are replaced by these because these functions are copied in this project to reduce inter-project dependencies
 from parse.TextGrid_Parsing import TextGrid2Dict, TextGrid2WordList, tierAliases, tier_names, readNonEmptyTokensTextGrid
-from Utilz import getMeanAndStDevError
+from align_eval.Utilz import getMeanAndStDevError
 
 
 
@@ -94,6 +94,7 @@ def wordsList2avrgTxt(annotationWordList, detectedWordList):
             
     return
 
+
 def evalAlignmentError(annotationURI, detectedURI, whichLevel, startIdx, endIdx ):
     '''reads detected from htk mlf
     @param detectedURI: URI of htk-mlf format
@@ -107,7 +108,7 @@ def evalAlignmentError(annotationURI, detectedURI, whichLevel, startIdx, endIdx 
     
     annotation_Token_List_NoPauses, detected_Token_List_noPauses, dummy, dummy, dummyInitialiTimeOffset = stripNonLyricsTokens(annotationURI, detectedTokenList, whichLevel, startIdx, endIdx)
 
-    evalErrors = _evalAlignmentError(annotation_Token_List_NoPauses, detected_Token_List_noPauses, whichLevel )
+    evalErrors = _eval_alignment_error(annotation_Token_List_NoPauses, detected_Token_List_noPauses, whichLevel)
     return evalErrors
 
 
@@ -170,44 +171,51 @@ def split_into_tokens(annotation_tokens):
     return num_tokens_in_all_phrases, currAnnoTsAndToken
 
 
-
-
-def _evalAlignmentError(reference_token_list, detected_Token_List, whichLevel, reference_labels=None, use_end_ts=False):
-    '''
+def _eval_alignment_error(reference_token_list,
+                          detected_Token_List,
+                          whichLevel,
+                          reference_labels=None,
+                          use_end_ts=False):
+    """
     Calculate alignment errors. Does not check token identities, but proceeds successively one-by-one  
     Make sure number of detected tokens (wihtout counting sp, sil ) is same as number of annotated tokens 
 
     for description see related method: PercentageCorrectEvaluator._evalPercentageCorrect
+    """
+    alignment_errors = []
 
-    '''
-    alignmentErrors = []
-    currAnnoTsAndToken, num_tokens_in_phrase = check_num_tokens(reference_token_list, detected_Token_List, reference_labels)
+    curr_anno_ts_and_token, num_tokens_in_phrase = check_num_tokens(reference_token_list,
+                                                                    detected_Token_List,
+                                                                    reference_labels)
     
     current_num_tokens = 0
+
     # evaluate: loop in tokens of gr truth reference annotation
-    for idx, currAnnoTsAndToken in enumerate(reference_token_list):
+    for idx, curr_anno_ts_and_token in enumerate(reference_token_list):
         
         if num_tokens_in_phrase[idx] == 0:
-            sys.exit('token (phrase) with no subtokens (words) in annotation file!')
+            sys.exit('token (phrase) with no sub-tokens (words) in annotation file!')
         
-        if  current_num_tokens >= len(detected_Token_List):
+        if current_num_tokens >= len(detected_Token_List):
             sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format( current_num_tokens, len(detected_Token_List)))
-            
+
+        begin_alignment_error, end_alignment_error = \
+            calcErrorBeginAndEndTs(detected_Token_List,
+                                   curr_anno_ts_and_token,
+                                   current_num_tokens,
+                                   num_tokens_in_phrase[idx])
+
+        alignment_errors.append(begin_alignment_error)
+
+        # end timestamp of each token considered, too.
+        # this makes sense when inter-word silences/instrumentals are present.
+        if use_end_ts:
+            alignment_errors.append(end_alignment_error)
         
-        beginAlignmentError, endAlignmentError = calcErrorBeginAndEndTs(detected_Token_List, currAnnoTsAndToken, current_num_tokens, num_tokens_in_phrase[idx])        
-        
-        
-        alignmentErrors.append(beginAlignmentError)
-        if use_end_ts: # end timestamp of each token considered, too. this makes sense when inter-word silences/instrumentals are present   
-            alignmentErrors.append(endAlignmentError)
-        
-        #### UPDATE: proceed in detection the number of subtokens in current token          
+        # UPDATE: proceed in detection the number of subtokens in current token.
         current_num_tokens += num_tokens_in_phrase[idx]
-    
-               
-    return  alignmentErrors
 
-
+    return alignment_errors
 
 
 def stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx):
@@ -318,7 +326,7 @@ def evalOneFile(argv):
         alignmentErrors  = evalAlignmentError(annoURI , detectedURI  , evalLevel)
         
         mean, stDev, median = getMeanAndStDevError(alignmentErrors)
-        print "mean : ", mean, "st dev: " , stDev
+        print("mean : ", mean, "st dev: " , stDev)
         
         
          ### OPTIONAL : open detection and annotation in praat. can be provided on request

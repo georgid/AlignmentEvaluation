@@ -27,10 +27,8 @@ pathUtils = os.path.join(parentDir, 'utilsLyrics')
 if pathUtils not in sys.path:
     sys.path.append(pathUtils )
 
-from Utilz import writeListOfListToTextFile, loadTextFile
-
-
-
+from align_eval.Utilz import writeListOfListToTextFile
+from align_eval.Utilz import loadTextFile
 
 def prepareOutputForPraat(outputHTKPhoneAlignedURI, wordAlignedSuffix, phonemeAlignedSuffix):
         '''
@@ -166,7 +164,7 @@ def _alignmentResult2TextGrid(grTruthAnnoURI, wordAlignedfileName, phonemeAligne
 def openTextGridInPraat(alignedResultPath, fileNameWordAnno, pathToAudioFile):
     '''     open Praat to visualize it (done for MAC OS X)
     '''
-    print PATH_TO_PRAAT
+    print(PATH_TO_PRAAT)
     if not os.path.exists(PATH_TO_PRAAT):
         logging.warning("Praat not found at given path {}, skipping opening Praat ..\n")
         return

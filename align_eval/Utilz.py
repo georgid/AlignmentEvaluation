@@ -42,7 +42,7 @@ def load_labeled_intervals(filename, delimiter=r'\s+'):
     try:  # start times and end times given
         starts, ends, labels = load_delimited(filename, [converter_comma, converter_comma, str],
                                           delimiter)
-    except Exception, e: # only start times given
+    except Exception as e: # only start times given
         starts,  labels = load_delimited(filename, [converter_comma, str], delimiter)
         filename_wav = filename[:-9] + '.wav'  # remove .refs.lab and replace it with .wav. TODO make this logic clearer
         if os.path.isfile(filename_wav):
@@ -114,7 +114,7 @@ def writeCsv(fileURI, list_, withListOfRows=1, append=0):
     else:
         fout = open(fileURI, 'wb')
     w = writer(fout)
-    print 'writing to csv file {}...'.format(fileURI)
+    print('writing to csv file {}...'.format(fileURI))
     for row in list_:
         if withListOfRows:
             w.writerow(row)
