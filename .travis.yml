@@ -7,7 +7,7 @@ before_install:
 install:
   - pip install -r requirements.txt
 
-script: pytest test/EvalMetricsTest.py --cov-report term-missing --cov app -v
+script: pytest test/EvalMetricsTest.py
 branches:
   only:
     - master
