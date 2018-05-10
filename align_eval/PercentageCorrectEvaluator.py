@@ -3,7 +3,7 @@ Created on Feb 24, 2015
 
 @author: joro
 '''
-from align_eval.ErrorEvaluator import stripNonLyricsTokens,\
+from align_eval.ErrorEvaluator import strip_non_lyrics_tokens,\
     loadDetectedTokenListFromMlf, check_num_tokens
 import logging
 import sys
@@ -30,7 +30,7 @@ def evalPercentageCorrect(annotationURI, outputHTKPhoneAlignedURI, whichTier, st
     detectedTokenList = loadDetectedTokenListFromMlf( outputHTKPhoneAlignedURI, whichTier )
     
     annotationTokenList, detectedTokenList, finalTsAnno,  initialTimeOffset = \
-     stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx)
+     strip_non_lyrics_tokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx)
     
     durationCorrect, totalDuration = _eval_percentage_correct(annotationTokenList, detectedTokenList, finalTsAnno, initialTimeOffset)
     return durationCorrect, totalDuration
@@ -92,6 +92,7 @@ def _eval_percentage_correct(reference_token_list,
 
     #  total length of annotated part, because non-vocal regions at end and beginning are not considered in results
     totalLength = float(final_ts_anno) - initial_time_offset_refs
+
     return durationCorrect, totalLength
 
 
