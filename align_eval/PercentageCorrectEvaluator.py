@@ -3,7 +3,7 @@ Created on Feb 24, 2015
 
 @author: joro
 '''
-from align_eval.ErrorEvaluator import stripNonLyricsTokens,\
+from align_eval.ErrorEvaluator import strip_non_lyrics_tokens,\
     loadDetectedTokenListFromMlf, check_num_tokens
 import logging
 import sys
@@ -30,18 +30,17 @@ def evalPercentageCorrect(annotationURI, outputHTKPhoneAlignedURI, whichTier, st
     detectedTokenList = loadDetectedTokenListFromMlf( outputHTKPhoneAlignedURI, whichTier )
     
     annotationTokenList, detectedTokenList, finalTsAnno,  initialTimeOffset = \
-     stripNonLyricsTokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx)
+     strip_non_lyrics_tokens(annotationURI, detectedTokenList, whichTier, startIdx, endIdx)
     
-    durationCorrect, totalDuration = _evalPercentageCorrect(annotationTokenList, detectedTokenList, finalTsAnno,  initialTimeOffset)
-    return  durationCorrect, totalDuration 
+    durationCorrect, totalDuration = _eval_percentage_correct(annotationTokenList, detectedTokenList, finalTsAnno, initialTimeOffset)
+    return durationCorrect, totalDuration
 
 
-
-
-
-
-
-def _evalPercentageCorrect(reference_token_list, detected_Token_List, finalTsAnno, initialTimeOffset_refs=0, reference_labels=None):
+def _eval_percentage_correct(reference_token_list,
+                             detected_token_List,
+                             final_ts_anno,
+                             initial_time_offset_refs=0,
+                             reference_labels=None):
     '''
     Calculate percentage of duration of correctly aligned tokens as suggested in
     Fujihara: LyricSynchronizer: Automatic Synchronization System Between Musical Audio Signals and Lyrics
@@ -56,43 +55,45 @@ def _evalPercentageCorrect(reference_token_list, detected_Token_List, finalTsAnn
 
     Parameters
     -------------- 
-    detected_Token_List: list [[]]
+    detected_token_List: list [[]]
         a list of triples: (startTs, endTs, word) detections 
     
     reference_token_list: list [[]]
         a list of triples: (startTs, endTs, word) reference annotations
     
-    finalTsAnno: float
+    final_ts_anno: float
         timestamps of last annotated token (e.g. last timestamp) 
         
     
     '''
     
     # WoRKAROUND. because currenty I dont store final sil in detected textFile .*Aligned 
-#     finalTsDetected = finalTsAnno
 
-
-    currAnnoTsAndToken, num_tokens_in_phrase = check_num_tokens(reference_token_list, detected_Token_List, reference_labels)
+    currAnnoTsAndToken, num_tokens_in_phrase = \
+        check_num_tokens(reference_token_list, detected_token_List, reference_labels)
     
     durationCorrect = 0
-    #     finalTsDetected = detectedTokenList[-1][0][1] # a word has one syllable
-    finalTsDetected = detected_Token_List[-1][1]
+    finalTsDetected = detected_token_List[-1][1]
 
     currentWordNumber = 0
     # evaluate: loop in tokens of gr truth reference annotation
     for idx, currAnnoTsAndToken in enumerate(reference_token_list):
         
-        durationCorrectCurr = calcCorrect(detected_Token_List, reference_token_list, \
-                            idx, currentWordNumber,  num_tokens_in_phrase[idx], finalTsAnno, finalTsDetected)         
+        durationCorrectCurr = calcCorrect(detected_token_List,
+                                          reference_token_list,
+                                          idx, currentWordNumber,
+                                          num_tokens_in_phrase[idx],
+                                          final_ts_anno,
+                                          finalTsDetected)
         durationCorrect += durationCorrectCurr
         
-        #### UPDATE: proceed in detection the number of subtokens in current token          
+        #### UPDATE: proceed in detection the number of subtokens in current token
         currentWordNumber += num_tokens_in_phrase[idx]
-    
-    
-    
-    totalLength = float(finalTsAnno) - initialTimeOffset_refs #  total length of annotated part, because non-vocal regions at end and beginning are not considered in results
-    return  durationCorrect, totalLength 
+
+    #  total length of annotated part, because non-vocal regions at end and beginning are not considered in results
+    totalLength = float(final_ts_anno) - initial_time_offset_refs
+
+    return durationCorrect, totalLength
 
 
 def calcCorrect(detectedTokenListNoPauses, annotationTokenListNoPauses, idx, currentWordNumber, numWordsInPhrase, finallTsAnno, finalTsDetected)  :

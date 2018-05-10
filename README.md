@@ -1,5 +1,5 @@
 
-Copyright  2017  Music Technology Group - Universitat Pompeu Fabra
+Copyright  2018  Music Technology Group - Universitat Pompeu Fabra
 
 AlignmentEvaluation
 ==============================
@@ -15,7 +15,6 @@ For definition of the metrics see Chapter 2.2.1 from [this thesis](http://compmu
 The algorithm considers only begin timestamps of each token. It is token-identities-agnostic, e.g. it does not try to match token-IDs between detected result and annotation, but proceeds successively one-by-one.  
 Extendable to the evaluation for any token-based alignment (e.g. if a token is a phrase, note, section )
 
-
 Supported detected file formats :  
 - mlf format of [htk](htk.eng.cam.ac.uk/) 
 - lab format  of tuples <begin_timestamp, end_timestamp, tokenID>. If end timestamps are not known, tuples are <begin_timestamp, tokenID>, but the percentage of correct segments might degrade for a dataset that has annotated end timestamps. 
@@ -23,9 +22,6 @@ Supported detected file formats :
 Supported annotation file formats: 
 - TextGrid of [Praat](www.praat.org/) 
 - lab format (see above). When exported from many tools among which e.g. [Audacity](http://www.audacityteam.org/home/). End time stamps are important only for the metric percentage of correct segments. They are ingored for the other two metrics.
-
- 
-
 
 Enjoy!
  
@@ -36,8 +32,6 @@ BUILD INSTRUCTIONS:
 - git clone https://github.com/georgid/AlignmentEvaluation
 - cd <path_to_installed AlignmentEvaluation>
 - python setup.py install
-
-
 
 
 USAGE: 
@@ -55,7 +49,7 @@ See also the individual metrics as test cases:
 
 - percentage of correct segments  : [test.EvalMetricsTest.evalPercentageCorrect_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L39)
 
-- percentage of correct tokens with tolerance window (IN PROGRESS)  : [test.EvalMetricsTest.evalAccuracy_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L66)
+- percentage of correct tokens with tolerance window (0.3s)  : [test.EvalMetricsTest.evalAccuracy_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L66)
 
 
 
@@ -64,7 +58,6 @@ See also the individual metrics as test cases:
 test.EvalMetricsTest.evalAccuracy_TextGird_test()
 
 test.EvalMetricsTest.eval_error_textGrid_test()
-
 
 There is also a module to convert automatically the decoded result to Praat's TextGrid format.
 This enables the  visualization of the decoding result together with the groundTruth in Praat:
@@ -78,8 +71,6 @@ To change extensions edit variables in WordLevelEvaluator
 ANNOTATION_EXT = '.TextGrid'
 DETECTED_EXT = '.dtwDurationAligned'
 when parsing TextGrid: tier_names are expected as defined in TextGrid_Parsing
-
-
 
 
 EXAMPLE: 
@@ -113,9 +104,6 @@ and
 3.38 4.15	nani
 
 
-
-
-
 LICENSE:
 -------------------
 AlignmentEvaluation is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation (FSF), either version 3 of the License, or (at your option) any later version.
@@ -127,6 +115,6 @@ You should have received a copy of the GNU General Public License along with thi
 CITATION: 
 ----------------------
 please cite 
-Dzhambazov, G.,  - Knowledge-based Probabilistic Modeling for Tracking Lyrics in Music Audio Signals, PhD Thesis
+Dzhambazov, G., - Knowledge-based Probabilistic Modeling for Tracking Lyrics in Music Audio Signals, PhD Thesis
 
 
