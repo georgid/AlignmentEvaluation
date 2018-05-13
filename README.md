@@ -1,5 +1,5 @@
 
-Copyright  2018  Music Technology Group - Universitat Pompeu Fabra
+Copyright 2018 Music Technology Group - Universitat Pompeu Fabra
 
 AlignmentEvaluation
 ==============================
@@ -8,7 +8,7 @@ A tool for computing common alignment metrics of tokens (a token could be at dif
 Three common metrics are implemented: 
 1) mean average absolute error/deviation
 2) percentage of correct segments from total audio duration
-3) percentage of correct tokens with tolerance window  (IN PROGRESS)
+3) percentage of correct tokens with tolerance window (0.3 seconds)
 
 For definition of the metrics see Chapter 2.2.1 from [this thesis](http://compmusic.upf.edu/phd-thesis-georgi)
 
@@ -41,15 +41,15 @@ USAGE:
 
 python [eval.py](https://github.com/georgid/AlignmentEvaluation/blob/master/align_eval/eval.py) 
 <path to file with reference word boundaries> <path to file with detected word boundaries>
-This reports both the mean average error and the percentage of correct segments
+This reports (1) the mean average error, (2) the percentage of correct segments and (3) percentage of correct tokens with tolerance window (0.3s).
 
 
 See also the individual metrics as test cases: 
-- mean average absolute error/deviation: [test.EvalMetricsTest.evalError_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L55)
+- mean average absolute error/deviation : [test.EvalMetricsTest.evalError_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/126c3fa5fa1994acdcfbe3ea1344acfe71ae2b8e/test/EvalMetricsTest.py#L117)
 
-- percentage of correct segments  : [test.EvalMetricsTest.evalPercentageCorrect_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L39)
+- percentage of correct segments : [test.EvalMetricsTest.evalPercentageCorrect_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/126c3fa5fa1994acdcfbe3ea1344acfe71ae2b8e/test/EvalMetricsTest.py#L76)
 
-- percentage of correct tokens with tolerance window (0.3s)  : [test.EvalMetricsTest.evalAccuracy_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/master/test/EvalMetricsTest.py#L66)
+- percentage of correct tokens with tolerance window (0.3 seconds) : [test.EvalMetricsTest.evalAccuracy_lab_test()](https://github.com/georgid/AlignmentEvaluation/blob/126c3fa5fa1994acdcfbe3ea1344acfe71ae2b8e/test/EvalMetricsTest.py#L151)
 
 
 
