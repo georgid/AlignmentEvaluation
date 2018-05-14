@@ -73,8 +73,8 @@ def load_labeled_intervals(filename, delimiter=r'\s+'):
 #         duration = starts[-1] + 1 # fake last word to be 1 sec long
         ends = starts[1:]; ends = np.append(ends, duration) 
     
-    starts, ends, labels = remove_dot_tokens(starts, ends,  labels)
-    
+    starts, ends, labels = remove_dot_tokens(starts, ends,  labels) # special words  '.' are discarded
+     
     # Stack into an interval matrix
     intervals = np.array([starts, ends]).T
     # Validate them, but throw a warning in place of an error
@@ -160,7 +160,7 @@ def writeCsv(fileURI, list_, withListOfRows=1, append=0):
     else:
         fout = open(fileURI, 'wb')
     w = writer(fout)
-    print 'writing to csv file {}...'.format(fileURI)
+    print('writing to csv file {}...'.format(fileURI) )
     for row in list_:
         if withListOfRows:
             w.writerow(row)
