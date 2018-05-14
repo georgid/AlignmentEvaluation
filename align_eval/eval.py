@@ -8,12 +8,15 @@ Created on Oct 10, 2017
 import sys
 import os
 import glob
+import numpy as np
+
 projDir = os.path.join(os.path.dirname(__file__), os.path.pardir)
 
 if projDir not in sys.path:
     sys.path.append(projDir)
 
-from align_eval.Utilz import load_labeled_intervals
+from align_eval.Utilz import load_labeled_intervals, load_delimited_variants,\
+    remove_dot_tokens
 from align_eval.Utilz import getMeanAndStDevError
 from align_eval.Utilz import writeCsv
 from parse.TextGrid_Parsing import tierAliases
@@ -22,15 +25,16 @@ from align_eval.PercentageCorrectEvaluator import _eval_percentage_correct
 from align_eval.ErrorEvaluator import _eval_percentage_tolerance
 
 
-def eval_all_metrics_lab(refs_URI, detected_URI):
+def eval_all_metrics_lab(refs_URI, detected_URI, tolerance=0.3):
     """
     run all eval metrics on one file
     """
     ref_intervals, ref_labels = load_labeled_intervals(refs_URI)
-    detected_intervals, detected_labels = load_labeled_intervals(detected_URI)
+    
+    detected_intervals, use_end_ts = load_detected_intervals(detected_URI)
 
     # metric 1: alignment error
-    alignmentErrors = _eval_alignment_error(ref_intervals, detected_intervals, tierAliases.phrases, ref_labels)
+    alignmentErrors = _eval_alignment_error(ref_intervals, detected_intervals, ref_labels, use_end_ts)
     mean, stDev, median = getMeanAndStDevError(alignmentErrors)
 
     # metric 2: percentage correct
@@ -47,18 +51,33 @@ def eval_all_metrics_lab(refs_URI, detected_URI):
     percentage_tolerance = _eval_percentage_tolerance(ref_intervals=ref_intervals,
                                                       detected_intervals=detected_intervals,
                                                       reference_labels=ref_labels,
-                                                      tolerance=0.3)
-
+                                                      tolerance=tolerance)
     return mean, percentage_correct, percentage_tolerance
 
 
+def load_detected_intervals(detected_URI):
+    detected_starts, detected_ends, labels = load_delimited_variants(detected_URI)
+    
+    use_end_ts = False #  do not use end_ts even if they have been detected
+    if detected_ends is None:
+        detected_ends = detected_starts # to keep format
+    
+    detected_starts, detected_ends, labels = remove_dot_tokens(detected_starts, detected_ends,  labels)
+    
+    detected_intervals = np.array([detected_starts, detected_ends]).T
+    return detected_intervals, use_end_ts
+
 def main_eval_one_file(argv):
-    if len(argv) != 3:
-        sys.exit('usage: {} <path to reference word boundaries> <path to detected word boundaries> '.format(sys.argv[0]))
+    if len(argv) != 4:
+        sys.exit('usage: {} <path to reference word boundaries> <path to detected word boundaries>  <tolerance>'.format(sys.argv[0]))
     refs_URI = argv[1]
     detected_URI = argv[2]
+    tolerance = float(argv[3])
     print('evaluating on {}'.format(refs_URI))
-    meanError, percentage_correct, percentage_tolerance = eval_all_metrics_lab(refs_URI, detected_URI)
+    meanError, percentage_correct, percentage_tolerance = eval_all_metrics_lab(refs_URI, detected_URI, tolerance )
+    
+    print ( "percentage {0:0.2f} with tolerance {1}".format(percentage_tolerance, tolerance) )
+
     return meanError, percentage_correct, percentage_tolerance
 
 

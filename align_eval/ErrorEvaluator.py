@@ -80,7 +80,7 @@ def evalAlignmentError(annotationURI, detectedURI, whichLevel, startIdx, endIdx 
     
     annotation_Token_List_NoPauses, detected_Token_List_noPauses, dummy, dummy, dummyInitialiTimeOffset = strip_non_lyrics_tokens(annotationURI, detectedTokenList, whichLevel, startIdx, endIdx)
 
-    evalErrors = _eval_alignment_error(annotation_Token_List_NoPauses, detected_Token_List_noPauses, whichLevel)
+    evalErrors = _eval_alignment_error(annotation_Token_List_NoPauses, detected_Token_List_noPauses)
     return evalErrors
 
 
@@ -146,7 +146,6 @@ def split_into_tokens(annotation_tokens):
 
 def _eval_alignment_error(reference_token_list,
                           detected_token_List,
-                          whichLevel,
                           reference_labels=None,
                           use_end_ts=False):
     """
@@ -198,7 +197,6 @@ def _eval_percentage_tolerance(ref_intervals,
 
     alignment_errors = _eval_alignment_error(reference_token_list=ref_intervals,
                                              detected_token_List=detected_intervals,
-                                             whichLevel=None,
                                              reference_labels=reference_labels)
     num_correct = 0
     for err in alignment_errors:

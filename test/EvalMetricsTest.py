@@ -44,8 +44,8 @@ def load_ref_and_detections(dataset='hanson'):
         detected_url = os.path.join(PATH_TEST_DATASET, 'umbrella_words.refs.lab')  # as if reference were detections
     elif dataset == 'mauch':
         # for Mauch's dataset
-        refs_url = os.path.join(PATH_TEST_DATASET, 'Muse.GuidingLight.refs.lab')
-        detected_url = os.path.join(PATH_TEST_DATASET, 'Muse.GuidingLight.refs.lab')  # as if reference were detections
+        refs_url = os.path.join(PATH_TEST_DATASET, 'Muse_GuidingLight.refs.lab')
+        detected_url = os.path.join(PATH_TEST_DATASET, 'Muse_GuidingLight.refs.lab')  # as if reference were detections
     else:
         raise ValueError("{} is not exist.".format(dataset))
 
@@ -120,7 +120,7 @@ def test_eval_error_lab_generic():
     """
     
     ref_intervals, detected_intervals, ref_labels = load_ref_and_detections(dataset='generic')
-    alignment_errors = _eval_alignment_error(ref_intervals, detected_intervals, tierAliases.phrases, ref_labels)
+    alignment_errors = _eval_alignment_error(ref_intervals, detected_intervals, ref_labels)
     mean_generic, std_dev_generic, median_generic = getMeanAndStDevError(alignment_errors)
 
     assert mean_generic == 0.98 and std_dev_generic == 0.96
@@ -132,7 +132,7 @@ def test_eval_error_lab_hansen():
     """
 
     ref_intervals, detected_intervals, ref_labels = load_ref_and_detections(dataset='hansen')
-    alignment_errors = _eval_alignment_error(ref_intervals, detected_intervals, tierAliases.phrases, ref_labels)
+    alignment_errors = _eval_alignment_error(ref_intervals, detected_intervals,  ref_labels)
     mean_hansen, std_dev_hansen, median_hansen = getMeanAndStDevError(alignment_errors)
     assert mean_hansen == 0.0 and std_dev_hansen == 0.0
 
@@ -143,7 +143,7 @@ def test_eval_error_lab_mauch():
     """
 
     ref_intervals, detected_intervals, ref_labels = load_ref_and_detections(dataset='mauch')
-    alignment_errors = _eval_alignment_error(ref_intervals, detected_intervals, tierAliases.phrases, ref_labels)
+    alignment_errors = _eval_alignment_error(ref_intervals, detected_intervals, ref_labels)
     mean_mauch, std_dev_mauch, median_mauch = getMeanAndStDevError(alignment_errors)
     assert mean_mauch == 0.0 and std_dev_mauch == 0.0
 
@@ -254,9 +254,10 @@ def eval_error_textgrid_test():
 
 
 if __name__ == '__main__':
-    test_eval_percentage_correct_lab_hansen()
-    test_eval_percentage_correct_lab_mauch()
+#     test_eval_percentage_correct_lab_hansen()
+#     test_eval_percentage_correct_lab_mauch()
+    test_eval_error_lab_mauch()
 
-    test_eval_percentage_tolerance_lab_generic()
-    test_eval_percentage_tolerance_lab_hansen()
+#     test_eval_percentage_tolerance_lab_generic()
+#     test_eval_percentage_tolerance_lab_hansen()
     test_eval_percentage_tolerance_lab_mauch()
