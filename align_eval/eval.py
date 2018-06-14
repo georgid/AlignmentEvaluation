@@ -76,7 +76,9 @@ def main_eval_one_file(argv):
     print('evaluating on {}'.format(refs_URI))
     meanError, percentage_correct, percentage_tolerance = eval_all_metrics_lab(refs_URI, detected_URI, tolerance )
     
-    print ( "percentage {0:0.2f} with tolerance {1}".format(percentage_tolerance, tolerance) )
+    print ( "Metric 1: average error {}".format(meanError) )
+    print ( "Metric 2: percentage correct segments {}".format(percentage_correct) )
+    print ( "Metric 3: percentage estimates {0:0.2f} with tolerance {1}".format(percentage_tolerance, tolerance) )
 
     return meanError, percentage_correct, percentage_tolerance
 
