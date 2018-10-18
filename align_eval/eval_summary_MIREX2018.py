@@ -9,28 +9,18 @@ import numpy as np
 import os
 from align_eval.Utilz import getMeanAndStDevError
 
+URI = '/Users/joro/Downloads/'
 
-def doit():
+def doit(algorithm_name, dataset_name, dataset_path):
     '''
     read all results ona submission/algorithm on one dataset
     Change the algorithm name and path to annotations
     '''
     
-    algorithm_name = 'GSLW3'
+
     
-    dataset_name = 'hansen_clean'
-    dataset_path  = '/hansen/clean/'
-    
-    dataset_name = 'hansen_mix'
-    dataset_path  = '/hansen/mix/'
-    
-    dataset_name = 'mauch'
-    dataset_path  = '/mauch/'
-    
-    # dataset_name = 'gracenote'
-    # dataset_path  = '/gracenote/'
-    
-    annotation_URI = 'MIREX_2018_ala' + dataset_path  + algorithm_name + '_' + dataset_name +'.csv'
+    results_dataset_file = algorithm_name + '_' + dataset_name +'.csv'
+    annotation_URI = os.path.join(URI + 'MIREX_2018_ala' + dataset_path, results_dataset_file)
     errors = []
     percentages = []
     percentages_e = []
@@ -50,13 +40,13 @@ def doit():
     
     ############ Write summary for a dataset #########################               
     
-    
-    output_URI = 'MIREX_2018_ala/'+ dataset_path + '/summary_' + dataset_name + '.csv'
+    result_summary_file = 'summary_' + dataset_name + '.csv'
+    output_URI = os.path.join(URI + 'MIREX_2018_ala' + dataset_path, result_summary_file)
     if not os.path.exists(output_URI):
-           pass
+        print ( '{output_URI} does not exist')
     else:
-            results = [[algorithm_name,'{:.2f}'.format(meanE), '{:.2f}'.format(meanP) ,  '{:.2f}'.format(meanPE)] ]
-            writeCsv_(output_URI, results, append=1)
+        results = [[algorithm_name,'{:.2f}'.format(meanE), '{:.2f}'.format(meanP) ,  '{:.2f}'.format(meanPE)] ]
+        writeCsv_(output_URI, results, append=1)
 
 
 def writeCsv_(fileURI, list_, withListOfRows=1, append=0):
@@ -81,5 +71,21 @@ def writeCsv_(fileURI, list_, withListOfRows=1, append=0):
 
 
 if __name__ == '__main__':
-    doit()
+    
+    algorithm_name = 'GSLW3'
+    algorithm_name = 'CW3'
+    
+    dataset_name = 'hansen_clean'
+    dataset_path  = '/hansen/clean/'
+    
+#     dataset_name = 'hansen_mix'
+#     dataset_path  = '/hansen/mix/'
+#     
+#     dataset_name = 'mauch'
+#     dataset_path  = '/mauch/'
+    
+    # dataset_name = 'gracenote'
+    # dataset_path  = '/gracenote/'
+    
+    doit(algorithm_name, dataset_name, dataset_path)
     
