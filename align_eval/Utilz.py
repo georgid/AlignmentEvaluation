@@ -175,6 +175,10 @@ def getMeanAndStDevError(alignmentErrors):
     '''
     statistics for an array
     '''
+    if len(alignmentErrors) == 0:
+        return 0,0,0
+    
+    
         
     # convert to np array
     absalignmentErrors = [0] * len(alignmentErrors)

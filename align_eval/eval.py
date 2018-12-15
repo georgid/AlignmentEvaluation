@@ -35,6 +35,7 @@ def eval_all_metrics_lab(refs_URI, detected_URI, tolerance=0.3):
 
     # metric 1: alignment error
     alignmentErrors = _eval_alignment_error(ref_intervals, detected_intervals, ref_labels, use_end_ts)
+    
     mean, stDev, median = getMeanAndStDevError(alignmentErrors)
 
     # metric 2: percentage correct
@@ -84,19 +85,20 @@ def main_eval_one_file(argv):
 
 
 def main_eval_all_files(argv):
-    if len(argv) != 4:
-        sys.exit('usage: {} <path dir with to reference word boundaries> <path to dir with detected word boundaries> <path_output>'.format(sys.argv[0]))
+    if len(argv) != 5:
+        sys.exit('usage: {} <path dir with to reference word boundaries> <path to dir with detected word boundaries> <path_output> <tolerance>'.format(sys.argv[0]))
     refs_dir_URI = argv[1]
     detected_dir_URI = argv[2]
     a = os.path.join(detected_dir_URI, "*.lab")
     lab_files = glob.glob(a)
     
+    tolerance = float(argv[4])
     results = [['Track', 'Average absolute error', 'Percentage of correct segments']]
     for lab_file in lab_files:
         base_name = os.path.basename(lab_file)
         
         ref_file = os.path.join(refs_dir_URI, base_name[:-4] + '.wordonset.tsv')
-        mean, percentage_correct, percentage_tolerance = main_eval_one_file(["dummy",  ref_file, lab_file])
+        mean, percentage_correct, percentage_tolerance = main_eval_one_file(["dummy",  ref_file, lab_file, tolerance])
         results.append([base_name[:-4], '{:.3f}'.format(mean),
                         '{:.3f}'.format(percentage_correct),
                         '{:.3f}'.format(percentage_tolerance)])
@@ -105,5 +107,5 @@ def main_eval_all_files(argv):
 
 
 if __name__ == '__main__':
-    main_eval_one_file(sys.argv)
-    # main_eval_all_files(sys.argv)
+#     main_eval_one_file(sys.argv)
+    main_eval_all_files(sys.argv)

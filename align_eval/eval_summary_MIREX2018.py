@@ -21,6 +21,7 @@ def doit(algorithm_name, dataset_name, dataset_path):
     
     results_dataset_file = algorithm_name + '_' + dataset_name +'.csv'
     annotation_URI = os.path.join(URI + 'MIREX_2018_ala' + dataset_path, results_dataset_file)
+    print(annotation_URI)
     errors = []
     percentages = []
     percentages_e = []
@@ -73,7 +74,7 @@ def writeCsv_(fileURI, list_, withListOfRows=1, append=0):
 if __name__ == '__main__':
     
     algorithm_name = 'GSLW3'
-    algorithm_name = 'CW3'
+#     algorithm_name = 'CW3'
     
     dataset_name = 'hansen_clean'
     dataset_path  = '/hansen/clean/'
@@ -81,8 +82,8 @@ if __name__ == '__main__':
 #     dataset_name = 'hansen_mix'
 #     dataset_path  = '/hansen/mix/'
 #     
-#     dataset_name = 'mauch'
-#     dataset_path  = '/mauch/'
+    dataset_name = 'mauch'
+    dataset_path  = '/mauch/'
     
     # dataset_name = 'gracenote'
     # dataset_path  = '/gracenote/'

@@ -155,11 +155,14 @@ def _eval_alignment_error(reference_token_list,
     for description see related method: PercentageCorrectEvaluator._evalPercentageCorrect
     """
     alignment_errors = []
-
-    curr_anno_ts_and_token, num_tokens_in_phrase = check_num_tokens(reference_token_list,
+    
+    try:
+        curr_anno_ts_and_token, num_tokens_in_phrase = check_num_tokens(reference_token_list,
                                                                     detected_token_List,
                                                                     reference_labels)
-    
+    except Exception as e:
+        print(' test: {e}')
+        return []
     current_num_tokens = 0
 
     # evaluate: loop in tokens of gr truth reference annotation
@@ -169,8 +172,8 @@ def _eval_alignment_error(reference_token_list,
             sys.exit('token (phrase) with no sub-tokens (words) in annotation file!')
         
         if current_num_tokens >= len(detected_token_List):
-            sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format(current_num_tokens, len(detected_token_List)))
-
+            print(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format(current_num_tokens, len(detected_token_List)))
+            return
         begin_alignment_error, end_alignment_error = \
             calcErrorBeginAndEndTs(detected_token_List,
                                    curr_anno_ts_and_token,
@@ -256,8 +259,8 @@ def check_num_tokens(reference_token_list, detected_Token_List, reference_labels
         
     # check that annotation and detection have same number of tokens
     if sum(num_tokens_in_phrase) != len(detected_Token_List):
-        sys.exit(' number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'.format(sum(num_tokens_in_phrase), len(detected_Token_List)))
-
+        raise Exception( 'number of tokens in annotation {} differs from  num tokens detected {}. No evaluation possible'\
+                         .format(sum(num_tokens_in_phrase), len(detected_Token_List)) )
     return currAnnoTsAndToken, num_tokens_in_phrase
 
 

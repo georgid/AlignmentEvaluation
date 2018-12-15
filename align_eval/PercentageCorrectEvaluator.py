@@ -69,9 +69,12 @@ def _eval_percentage_correct(reference_token_list,
     
     # WoRKAROUND. because currenty I dont store final sil in detected textFile .*Aligned 
 
-    currAnnoTsAndToken, num_tokens_in_phrase = \
+    try:
+        currAnnoTsAndToken, num_tokens_in_phrase = \
         check_num_tokens(reference_token_list, detected_token_List, reference_labels)
-    
+    except Exception as e:
+        print(e)
+        return 0,1
     durationCorrect = 0
     finalTsDetected = detected_token_List[-1][1]
 
