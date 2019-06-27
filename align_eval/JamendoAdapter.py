@@ -35,14 +35,15 @@ def convert_annotations(jamendo_dataset_path, annotation_output_path):
         lab_path = os.path.join(annotation_output_path, os.path.basename(onset_path).replace(".wordonset.txt", ".wordonset.tsv"))
         with open(lab_path, "w") as lab_file:
             for idx in range(len(onsets)):
-                lab_file.write(onsets[idx] + "," + offsets[idx] + "," + words[idx] + "\n")
+                lab_file.write(onsets[idx] + " " + offsets[idx] + " " + words[idx] + "\n")
 
-def convert_predictions(jamendo_dataset_path, predictions_path, predictions_output_path):
+def convert_predictions(jamendo_dataset_path, predictions_path, predictions_output_path, delay=0.0):
     '''
     For the given predictions made according to Jamendolyrics dataset format (start, end timestamps), convert to the expected MIREX output format
     :param jamendo_dataset_path: Base directory of jamendolyrics dataset
     :param predictions_path: Predictions (ending in _align.csv, name is otherwise the same as the files in the jamendolyrics dataset)
     :param predictions_output_path: Folder where converted predictions should be saved
+    :param Delay in seconds to add to all predictions
     :return:
     '''
     if not os.path.exists(predictions_output_path):
@@ -51,6 +52,9 @@ def convert_predictions(jamendo_dataset_path, predictions_path, predictions_outp
         with open(onset_path, "r") as onset_file:
             # Get onset and offset times
             onsets = list(csv.reader(onset_file))
+
+        # Correct onsets by specified delay
+        onsets = [[float(event[0])+delay, float(event[1])+delay] for event in onsets]
 
         # Get words
         with open(os.path.join(jamendo_dataset_path, "lyrics", os.path.basename(onset_path).replace("_align.csv", ".words.txt")), "r") as word_file:
@@ -62,7 +66,7 @@ def convert_predictions(jamendo_dataset_path, predictions_path, predictions_outp
         lab_path = os.path.join(predictions_output_path, os.path.basename(onset_path).replace("_align.csv", ".lab"))
         with open(lab_path, "w") as lab_file:
             for idx in range(len(onsets)):
-                lab_file.write(str(preds[idx][0]) + "," + str(preds[idx][1]) + "," + str(preds[idx][2]) + "\n")
+                lab_file.write(str(preds[idx][0]) + " " + str(preds[idx][1]) + " " + str(preds[idx][2]) + "\n")
 
 #convert_annotations("/home/daniel/Projects/jamendolyrics", "test")
-#convert_predictions("/home/daniel/Projects/jamendolyrics", "/home/daniel/Projects/jamendolyrics/predictions/stoller_model", "test_pred")
+#convert_predictions("/home/daniel/Projects/jamendolyrics", "/home/daniel/Projects/jamendolyrics/predictions/stoller_model", "test_pred", 0.180)
