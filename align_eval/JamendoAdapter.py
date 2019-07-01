@@ -53,8 +53,9 @@ def convert_predictions(jamendo_dataset_path, predictions_path, predictions_outp
             # Get onset and offset times
             onsets = list(csv.reader(onset_file))
 
-        # Correct onsets by specified delay
-        onsets = [[float(event[0])+delay, float(event[1])+delay] for event in onsets]
+        # Correct onsets by specified delay, set offset = onset time of next word to make sure percentage of correct segments metric ignores silence durations between words
+        onsets = [[float(onsets[idx][0])+delay, float(onsets[idx+1][0])+delay] for idx in range(len(onsets)-1)] +\
+                 [[float(onsets[-1][0])+delay, float(onsets[-1][1])+delay]]
 
         # Get words
         with open(os.path.join(jamendo_dataset_path, "lyrics", os.path.basename(onset_path).replace("_align.csv", ".words.txt")), "r") as word_file:
