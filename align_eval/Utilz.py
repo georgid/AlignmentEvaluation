@@ -156,9 +156,9 @@ def writeCsv(fileURI, list_, withListOfRows=1, append=0):
     '''
     from csv import writer
     if append:
-        fout = open(fileURI, 'ab')
+        fout = open(fileURI, 'a')
     else:
-        fout = open(fileURI, 'wb')
+        fout = open(fileURI, 'w')
     w = writer(fout)
     print('writing to csv file {}...'.format(fileURI) )
     for row in list_:
