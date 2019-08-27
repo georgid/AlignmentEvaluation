@@ -97,7 +97,7 @@ def main_eval_all_files(argv):
     for lab_file in lab_files:
         base_name = os.path.basename(lab_file)
         
-        ref_file = os.path.join(refs_dir_URI, base_name[:-4] + '.wordonset.tsv')
+        ref_file = os.path.join(refs_dir_URI, base_name[:-4] + '.wordonset.txt')
         mean, percentage_correct, percentage_tolerance = main_eval_one_file(["dummy",  ref_file, lab_file, tolerance])
         results.append([base_name[:-4], '{:.3f}'.format(mean),
                         '{:.3f}'.format(percentage_correct),
