@@ -182,8 +182,8 @@ def getMeanAndStDevError(alignmentErrors):
         absalignmentErrors[index] = abs(alError)
     
     # calculate with numpy
-    mean = np.round(np.mean(absalignmentErrors), decimals=2)
-    median = np.round( np.median(absalignmentErrors), decimals=2)
-    stDev = np.round( np.std(alignmentErrors), decimals=2)
+    mean = np.mean(absalignmentErrors)
+    median = np.median(absalignmentErrors)
+    stDev = np.std(alignmentErrors)
     
     return mean, stDev, median

@@ -91,7 +91,7 @@ def main_eval_all_files(argv):
     a = os.path.join(detected_dir_URI, "*.lab")
     lab_files = glob.glob(a)
     
-    results = [['Track', 'Average absolute error', 'Percentage of correct segments']]
+    results = [['Track', 'Average absolute error', 'Percentage of correct segments', 'Percentage of correct onsets with tolerance']]
     for lab_file in lab_files:
         base_name = os.path.basename(lab_file)
         

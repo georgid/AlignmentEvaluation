@@ -284,8 +284,7 @@ def calcError(annotatedTokenTs, detectedTokenTs):
     abs error btw a token form anno and detected 
     '''
     currAlignmentError = float(annotatedTokenTs) - float(detectedTokenTs)
-    currAlignmentError = numpy.round(currAlignmentError, decimals=2)
-    return currAlignmentError      
+    return currAlignmentError
     
 
 def evalOneFile(argv):
