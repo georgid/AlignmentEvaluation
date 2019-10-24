@@ -86,23 +86,22 @@ def main_eval_one_file(argv):
 
 def main_eval_all_files(argv):
     if len(argv) != 5:
-        sys.exit('usage: {} <path dir with to reference word boundaries> <path to dir with detected word boundaries> <path_output> <tolerance>'.format(sys.argv[0]))
+        sys.exit('usage: {} <path dir with to reference word boundaries> <path to dir with detected word boundaries> <tolerance (s)> <path_output>'.format(sys.argv[0]))
     refs_dir_URI = argv[1]
     detected_dir_URI = argv[2]
     a = os.path.join(detected_dir_URI, "*.lab")
     lab_files = glob.glob(a)
     
-    tolerance = float(argv[4])
-    results = [['Track', 'Average absolute error', 'Percentage of correct segments']]
+    results = [['Track', 'Average absolute error', 'Percentage of correct segments', 'Percentage of correct onsets with tolerance']]
     for lab_file in lab_files:
         base_name = os.path.basename(lab_file)
         
-        ref_file = os.path.join(refs_dir_URI, base_name[:-4] + '.wordonset.txt')
-        mean, percentage_correct, percentage_tolerance = main_eval_one_file(["dummy",  ref_file, lab_file, tolerance])
+        ref_file = os.path.join(refs_dir_URI, base_name[:-4] + '.wordonset.tsv')
+        mean, percentage_correct, percentage_tolerance = main_eval_one_file(["dummy",  ref_file, lab_file, argv[3]])
         results.append([base_name[:-4], '{:.3f}'.format(mean),
                         '{:.3f}'.format(percentage_correct),
                         '{:.3f}'.format(percentage_tolerance)])
-    output_URI = argv[3]
+    output_URI = argv[4]
     writeCsv(os.path.join(output_URI, 'results.csv'), results)
 
 

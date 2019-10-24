@@ -156,9 +156,9 @@ def writeCsv(fileURI, list_, withListOfRows=1, append=0):
     '''
     from csv import writer
     if append:
-        fout = open(fileURI, 'ab')
+        fout = open(fileURI, 'a')
     else:
-        fout = open(fileURI, 'wb')
+        fout = open(fileURI, 'w')
     w = writer(fout)
     print('writing to csv file {}...'.format(fileURI) )
     for row in list_:
@@ -186,8 +186,8 @@ def getMeanAndStDevError(alignmentErrors):
         absalignmentErrors[index] = abs(alError)
     
     # calculate with numpy
-    mean = np.round(np.mean(absalignmentErrors), decimals=2)
-    median = np.round( np.median(absalignmentErrors), decimals=2)
-    stDev = np.round( np.std(alignmentErrors), decimals=2)
+    mean = np.mean(absalignmentErrors)
+    median = np.median(absalignmentErrors)
+    stDev = np.std(alignmentErrors)
     
     return mean, stDev, median

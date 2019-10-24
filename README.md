@@ -1,4 +1,6 @@
 
+[![Build Status](https://travis-ci.org/georgid/AlignmentEvaluation.svg)](https://travis-ci.org/georgid/AlignmentEvaluation)
+
 Copyright 2018 Music Technology Group - Universitat Pompeu Fabra
 
 AlignmentEvaluation
