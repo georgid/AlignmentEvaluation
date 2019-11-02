@@ -59,19 +59,21 @@ def load_labeled_intervals(filename, delimiter=r'\s+'):
     # Use our universal function to load in the events
     
     starts, ends, labels = load_delimited_variants(filename, delimiter)
+    has_ends = True
     
-    if ends is None: # add ends
+    if ends is None: # add artificial ends, so that we can use intervals from mir_eval 
         
-        filename_base = remove_extension(filename); filename_wav = filename_base + '.wav'
-        if not os.path.isfile(filename_wav):
-            dir = ''
-            while not os.path.isfile(filename_wav):
-                dir = raw_input('cannot find {} \n Please enter folder where the wav file is:'.format(filename_wav))
-                filename_wav = os.path.join(dir, os.path.basename(filename_wav))
+#         filename_base = remove_extension(filename); filename_wav = filename_base + '.wav'
+#         if not os.path.isfile(filename_wav):
+#             dir = ''
+#             while not os.path.isfile(filename_wav):
+#                 dir = raw_input('cannot find {} \n Please enter folder where the wav file is:'.format(filename_wav))
+#                 filename_wav = os.path.join(dir, os.path.basename(filename_wav))
         
-        duration = get_duration_audio(filename_wav) # generate end timestamps from following start timestamps
-#         duration = starts[-1] + 1 # fake last word to be 1 sec long
-        ends = starts[1:]; ends = np.append(ends, duration) 
+#         duration = get_duration_audio(filename_wav) # generate end timestamps from following start timestamps
+        duration = starts[-1] + 0.1 # fake last word to be 0.1 sec long
+        ends = starts[1:]; ends = np.append(ends, duration)
+        has_ends = False 
     
     starts, ends, labels = remove_dot_tokens(starts, ends,  labels) # special words  '.' are discarded
      
@@ -83,7 +85,7 @@ def load_labeled_intervals(filename, delimiter=r'\s+'):
     except ValueError as error:
         warnings.warn(error.args[0])
 
-    return intervals, labels
+    return intervals, labels, has_ends
 
 def remove_extension(URI):
     '''

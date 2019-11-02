@@ -10,6 +10,8 @@ import os
 import glob
 import numpy as np
 
+
+EXTENSION_RECO = 'final.txt'
 projDir = os.path.join(os.path.dirname(__file__), os.path.pardir)
 
 if projDir not in sys.path:
@@ -29,7 +31,7 @@ def eval_all_metrics_lab(refs_URI, detected_URI, tolerance=0.3):
     """
     run all eval metrics on one file
     """
-    ref_intervals, ref_labels = load_labeled_intervals(refs_URI)
+    ref_intervals, ref_labels, has_ends = load_labeled_intervals(refs_URI)
     
     detected_intervals, use_end_ts = load_detected_intervals(detected_URI)
 
@@ -39,21 +41,24 @@ def eval_all_metrics_lab(refs_URI, detected_URI, tolerance=0.3):
     mean, stDev, median = getMeanAndStDevError(alignmentErrors)
 
     # metric 2: percentage correct
-    initialTimeOffset_refs = ref_intervals[0][0]
-    finalts_refs = ref_intervals[-1][1]
-    durationCorrect, totalLength  = _eval_percentage_correct(reference_token_list=ref_intervals,
-                                                             detected_token_List=detected_intervals,
-                                                             final_ts_anno=finalts_refs,
-                                                             initial_time_offset_refs=initialTimeOffset_refs,
-                                                             reference_labels=ref_labels)
-    percentage_correct = durationCorrect / totalLength
+    if has_ends:
+        initialTimeOffset_refs = ref_intervals[0][0]
+        finalts_refs = ref_intervals[-1][1]
+        durationCorrect, totalLength  = _eval_percentage_correct(reference_token_list=ref_intervals,
+                                                                 detected_token_List=detected_intervals,
+                                                                 final_ts_anno=finalts_refs,
+                                                                 initial_time_offset_refs=initialTimeOffset_refs,
+                                                                 reference_labels=ref_labels)
+        percentage_correct = durationCorrect / totalLength
+    else:
+        percentage_correct = None
 
     # metric 3: percentage tolerance
     percentage_tolerance = _eval_percentage_tolerance(ref_intervals=ref_intervals,
                                                       detected_intervals=detected_intervals,
                                                       reference_labels=ref_labels,
                                                       tolerance=tolerance)
-    return mean, percentage_correct, percentage_tolerance
+    return mean, median, percentage_correct, percentage_tolerance
 
 
 def load_detected_intervals(detected_URI):
@@ -75,13 +80,14 @@ def main_eval_one_file(argv):
     detected_URI = argv[2]
     tolerance = float(argv[3])
     print('evaluating on {}'.format(refs_URI))
-    meanError, percentage_correct, percentage_tolerance = eval_all_metrics_lab(refs_URI, detected_URI, tolerance )
+    meanError, median_error, percentage_correct, percentage_tolerance = eval_all_metrics_lab(refs_URI, detected_URI, tolerance )
     
-    print ( "Metric 1: average error {}".format(meanError) )
-    print ( "Metric 2: percentage correct segments {}".format(percentage_correct) )
+    print ( "Metric 1: average error {}, median error {}".format(meanError, median_error) )
+    if percentage_correct:
+        print ( "Metric 2: percentage correct segments {}".format(percentage_correct) )
     print ( "Metric 3: percentage estimates {0:0.2f} with tolerance {1}".format(percentage_tolerance, tolerance) )
 
-    return meanError, percentage_correct, percentage_tolerance
+    return meanError, median_error, percentage_correct, percentage_tolerance
 
 
 def main_eval_all_files(argv):
@@ -89,18 +95,25 @@ def main_eval_all_files(argv):
         sys.exit('usage: {} <path dir with to reference word boundaries> <path to dir with detected word boundaries> <tolerance (s)> <path_output>'.format(sys.argv[0]))
     refs_dir_URI = argv[1]
     detected_dir_URI = argv[2]
-    a = os.path.join(detected_dir_URI, "*.lab")
+    a = os.path.join(detected_dir_URI, "*.{}".format(EXTENSION_RECO))
     lab_files = glob.glob(a)
+    print('Found {} alignment files'.format(len(lab_files)))
     
-    results = [['Track', 'Average absolute error', 'Percentage of correct segments', 'Percentage of correct onsets with tolerance']]
+    results = [['Track', 'Average absolute error', 'Median absolute error', 'Percentage of correct segments', 'Percentage of correct onsets with tolerance']]
     for lab_file in lab_files:
         base_name = os.path.basename(lab_file)
-        
-        ref_file = os.path.join(refs_dir_URI, base_name[:-4] + '.wordonset.tsv')
-        mean, percentage_correct, percentage_tolerance = main_eval_one_file(["dummy",  ref_file, lab_file, argv[3]])
-        results.append([base_name[:-4], '{:.3f}'.format(mean),
-                        '{:.3f}'.format(percentage_correct),
+        extension_length = len(EXTENSION_RECO) + 1
+        ref_file = os.path.join(refs_dir_URI, base_name[:-extension_length] + '.wordonset.tsv')
+        mean, median, percentage_correct, percentage_tolerance = main_eval_one_file(["dummy",  ref_file, lab_file, argv[3]])
+        if percentage_correct:
+            perc_correct = '{:.3f}'.format(percentage_correct)
+        else:
+            perc_correct = 'NaN'
+        results.append([base_name[:-extension_length], '{:.3f}'.format(mean),
+                        '{:.3f}'.format(median),
+                         perc_correct,
                         '{:.3f}'.format(percentage_tolerance)])
+            
     output_URI = argv[4]
     writeCsv(os.path.join(output_URI, 'results.csv'), results)
 

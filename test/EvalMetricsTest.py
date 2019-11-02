@@ -49,8 +49,8 @@ def load_ref_and_detections(dataset='hanson'):
     else:
         raise ValueError("{} is not exist.".format(dataset))
 
-    ref_intervals, ref_labels = load_labeled_intervals(refs_url)
-    detected_intervals, detected_labels = load_labeled_intervals(detected_url)
+    ref_intervals, ref_labels, _ = load_labeled_intervals(refs_url)
+    detected_intervals, detected_labels, _ = load_labeled_intervals(detected_url)
 
     return ref_intervals, detected_intervals, ref_labels
 

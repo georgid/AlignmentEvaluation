@@ -23,6 +23,7 @@ def doit(algorithm_name, dataset_name, dataset_path):
     annotation_URI = os.path.join(URI + 'MIREX_2018_ala' + dataset_path, results_dataset_file)
     print(annotation_URI)
     errors = []
+    median_errors = []
     percentages = []
     percentages_e = []
     
@@ -32,10 +33,12 @@ def doit(algorithm_name, dataset_name, dataset_path):
                     if i == 0:
                         continue
                     errors.append( (float(row[1])) )
-                    percentages.append( (float(row[2])) )
-                    percentages_e.append( (float(row[3])) )
+                    median_errors.append( (float(row[2])) )
+                    percentages.append( (float(row[3])) ) # TODO: check if NaN
+                    percentages_e.append( (float(row[4])) )
                     
     meanE,  stdevE, medianE = getMeanAndStDevError(errors)
+    meanMedE,  stdevE, medianE = getMeanAndStDevError(median_errors)
     meanP, stdevP, medianP = getMeanAndStDevError(percentages)
     meanPE, stdevP, medianP = getMeanAndStDevError(percentages_e)
     
@@ -46,7 +49,7 @@ def doit(algorithm_name, dataset_name, dataset_path):
     if not os.path.exists(output_URI):
         print ( '{output_URI} does not exist')
     else:
-        results = [[algorithm_name,'{:.2f}'.format(meanE), '{:.2f}'.format(meanP) ,  '{:.2f}'.format(meanPE)] ]
+        results = [[algorithm_name,'{:.2f}'.format(meanE), '{:.2f}'.format(meanMedE), '{:.2f}'.format(meanP) ,  '{:.2f}'.format(meanPE)] ]
         writeCsv_(output_URI, results, append=1)
 
 
