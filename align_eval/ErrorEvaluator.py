@@ -161,7 +161,7 @@ def _eval_alignment_error(reference_token_list,
                                                                     detected_token_List,
                                                                     reference_labels)
     except Exception as e:
-        print(' test: {e}')
+        print(e)
         return []
     current_num_tokens = 0
 
