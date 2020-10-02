@@ -11,7 +11,14 @@ import glob
 import numpy as np
 
 
-EXTENSION_RECO = 'final.txt'
+EXTENSION_RECO = '.final.txt'
+# Mauch
+# EXTENSION_RECO = '_align.txt'
+# Jamendo
+# EXTENSION_RECO = '_align.csv'
+
+# EXTENSION_RECO ='.mp3_align.txt'
+
 projDir = os.path.join(os.path.dirname(__file__), os.path.pardir)
 
 if projDir not in sys.path:
@@ -34,7 +41,7 @@ def eval_all_metrics_lab(refs_URI, detected_URI, tolerance=0.3):
     ref_intervals, ref_labels, has_ends = load_labeled_intervals(refs_URI)
     
     detected_intervals, use_end_ts = load_detected_intervals(detected_URI)
-
+    
     # metric 1: alignment error
     alignmentErrors = _eval_alignment_error(ref_intervals, detected_intervals, ref_labels, use_end_ts)
     
@@ -95,14 +102,14 @@ def main_eval_all_files(argv):
         sys.exit('usage: {} <path dir with to reference word boundaries> <path to dir with detected word boundaries> <tolerance (s)> <path_output>'.format(sys.argv[0]))
     refs_dir_URI = argv[1]
     detected_dir_URI = argv[2]
-    a = os.path.join(detected_dir_URI, "*.{}".format(EXTENSION_RECO))
+    a = os.path.join(detected_dir_URI, "*{}".format(EXTENSION_RECO))
     lab_files = glob.glob(a)
     print('Found {} alignment files'.format(len(lab_files)))
     
     results = [['Track', 'Average absolute error', 'Median absolute error', 'Percentage of correct segments', 'Percentage of correct onsets with tolerance']]
     for lab_file in lab_files:
         base_name = os.path.basename(lab_file)
-        extension_length = len(EXTENSION_RECO) + 1
+        extension_length = len(EXTENSION_RECO)
         ref_file = os.path.join(refs_dir_URI, base_name[:-extension_length] + '.wordonset.tsv')
         mean, median, percentage_correct, percentage_tolerance = main_eval_one_file(["dummy",  ref_file, lab_file, argv[3]])
         if percentage_correct:
