@@ -157,7 +157,7 @@ def _eval_alignment_error(reference_token_list,
     alignment_errors = []
     
     try:
-        curr_anno_ts_and_token, num_tokens_in_phrase = check_num_tokens(reference_token_list,
+        _, num_tokens_in_phrase = check_num_tokens(reference_token_list,
                                                                     detected_token_List,
                                                                     reference_labels)
     except Exception as e:
@@ -252,10 +252,12 @@ def check_num_tokens(reference_token_list, detected_Token_List, reference_labels
         sys.exit(' detected token list is empty! Check code')
     
     # divide phrases into tokens
-    if reference_labels != None: # labels of reference tokens given separately
+    if reference_labels: # labels of reference tokens given separately
         num_tokens_in_phrase, currAnnoTsAndToken = split_into_tokens(reference_labels)
     else:
-        num_tokens_in_phrase, currAnnoTsAndToken = split_into_tokens(reference_token_list) # labels should be the last field of reference_token_list
+#         num_tokens_in_phrase, currAnnoTsAndToken = split_into_tokens(reference_token_list) # labels should be the last field of reference_token_list
+        num_tokens_in_phrase = [1] * len(reference_token_list)
+        currAnnoTsAndToken = None
         
     # check that annotation and detection have same number of tokens
     if sum(num_tokens_in_phrase) != len(detected_Token_List):

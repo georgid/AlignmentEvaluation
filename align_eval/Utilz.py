@@ -40,14 +40,23 @@ def load_delimited_variants(filename, delimiter=r'\s+'):
     '''
     converter_comma = lambda val:float(val.replace(',', '.')) # replace ',' by '.'
     ends = None
-    try:
-        starts, ends, labels = load_delimited(filename, [converter_comma, converter_comma, str], delimiter) # start times and end times given
-    except Exception as e: # only start times given
+    try: 
+        starts, ends, labels = load_delimited(filename, [float, float, str]) # start times and end times given
+    except Exception as e:
         try:
-            starts, labels = load_delimited(filename, [converter_comma, str], delimiter)
-        except Exception:
-            labels, starts = load_delimited(filename, [str, converter_comma], delimiter)
-            pass
+            starts, ends, labels = load_delimited(filename, [converter_comma, converter_comma, str], delimiter) # start times and end times given, but using non-'.' comma
+        except Exception as e: # only start times given
+            try:
+                starts, labels = load_delimited(filename, [converter_comma, str], delimiter)
+            except Exception:
+                try:
+                    labels, starts = load_delimited(filename, [str, converter_comma], delimiter)
+                except Exception:
+                    try: 
+                        starts = load_delimited(filename, [converter_comma], delimiter)
+                    except Exception:
+                        starts, ends = load_delimited(filename, [converter_comma, converter_comma], delimiter)
+                    labels = None
     return  starts, ends, labels
 
 def load_labeled_intervals(filename, delimiter=r'\s+'):
@@ -75,7 +84,7 @@ def load_labeled_intervals(filename, delimiter=r'\s+'):
         ends = starts[1:]; ends = np.append(ends, duration)
         has_ends = False 
     
-    starts, ends, labels = remove_dot_tokens(starts, ends,  labels) # special words  '.' are discarded
+    #starts, ends, labels = remove_dot_tokens(starts, ends,  labels) # special words  '.' are discarded
      
     # Stack into an interval matrix
     intervals = np.array([starts, ends]).T
