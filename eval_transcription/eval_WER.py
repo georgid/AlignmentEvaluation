@@ -17,9 +17,10 @@ EXTENSION_RECO = '.transcribed.txt'
 
 def MakeAptFile(outfile,infile,filename):
     fout = open(outfile,'w')
-    line = open(infile,'r').readlines()
-    if len(line)>1: print("Please check")
-    fout.write(filename+' '+line[0].lower())
+    lines = open(infile,'r').readlines()
+    if len(lines)>1: print("Please check {}. It has more than one line".format(infile))
+    print(lines)
+    fout.write(filename+' '+lines[0].lower())
     fout.close()
 
 
@@ -39,6 +40,7 @@ def main_eval_all_files(argv):
         base_name = os.path.basename(lab_file)
         extension_length = len(EXTENSION_RECO)
         ref_file = os.path.join(refs_dir_URI, base_name[:-extension_length] + '.words.txt')
+        print("working on {}".format(ref_file))
         MakeAptFile('ref', ref_file, base_name[:-extension_length])
         MakeAptFile('transcr', lab_file, base_name[:-extension_length])
         WER,ins,dele,sub,total = ComputeWER('ref','transcr')
