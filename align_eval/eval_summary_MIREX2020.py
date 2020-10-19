@@ -9,7 +9,7 @@ import numpy as np
 import os
 from align_eval.Utilz import getMeanAndStDevError
 
-URI = '/Users/joro/Dropbox/MIREX2019_results/'
+URI = '/Users/joro/Dropbox/MIREX2020_results/ala/'
 
 def doit(algorithm_name, dataset_name):
     '''
@@ -20,7 +20,7 @@ def doit(algorithm_name, dataset_name):
 
     
 #     results_dataset_file = algorithm_name + '/results.csv'
-    annotation_URI = os.path.join(URI + dataset_name, algorithm_name, 'metrics', 'results.csv')
+    annotation_URI = os.path.join(URI + dataset_name, algorithm_name, 'results.csv')
     print(annotation_URI)
     errors = []
     median_errors = []
@@ -54,8 +54,11 @@ def doit(algorithm_name, dataset_name):
         results = [[algorithm_name,'{:.2f}'.format(meanE), '{:.2f}'.format(meanMedE), 'NA' ,  '{:.2f}'.format(meanPE)] ]
 
     if not os.path.exists(output_URI):
+        results_prefix = [['Submission', 'Average absolute error', 'Median absolute error', 'Percentage of correct segments', 'Percentage of correct onsets with tolerance']]
+        writeCsv_(output_URI, results_prefix, append=0)
+        writeCsv_(output_URI, results, append=1)
         print ( 'file {} written'.format(output_URI))
-        writeCsv_(output_URI, results, append=0)
+
     else:
         print ( 'Appended to file {}'.format(output_URI))
         writeCsv_(output_URI, results, append=1)
@@ -84,17 +87,15 @@ def writeCsv_(fileURI, list_, withListOfRows=1, append=0):
 
 if __name__ == '__main__':
     
-    algorithm_name = 'GYL1'
-    algorithm_name = 'ED1'
-    algorithm_name = 'SDE1'
-    algorithm_name = 'SDE2'
-    
-    dataset_name = 'HansensDataset_acappella'    
-#     dataset_name = 'HansensDataset'
-#     dataset_name = 'MauchsDataset'
-#     dataset_name = 'Gracenote'
-#     dataset_name = 'jamendolyrics'
+    algorithm_names = ['GGL1', 'GGL2','ZWZL1', 'ZWZL2', 'ZWZL3', 'DDA1']
 
     
-    doit(algorithm_name, dataset_name)
+    dataset_name = 'HansensDataset_acappella'    
+    dataset_name = 'HansensDataset'
+    dataset_name = 'MauchsDataset'
+#     dataset_name = 'Gracenote'
+    dataset_name = 'jamendolyrics'
+
+    for algorithm_name in algorithm_names:
+        doit(algorithm_name, dataset_name)
     
