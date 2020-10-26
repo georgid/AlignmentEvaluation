@@ -1,7 +1,7 @@
 import os
 import subprocess
 import sys
-
+# make sure to add PATH=$PATH:/Users/joro//workspace/kaldi/dist/bin/
 
 def ComputeWER(ref,hyp):
         command = 'compute-wer --text --mode=all ark:'+ref+' ark:'+hyp
