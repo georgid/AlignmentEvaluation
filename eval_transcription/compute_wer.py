@@ -79,7 +79,7 @@ def wer(r, h):
             i,j = [i - 1, j]
             deletes += 1
 
-    return d[len(r)][len(h)] / len(r), inserts, deletes, substitutes, len(h)
+    return 100.0 * d[len(r)][len(h)] / len(r), inserts, deletes, substitutes, len(h)
 
 def compute_wer_from_file(r, h):
     with open(r, "r") as f:
