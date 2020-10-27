@@ -1,8 +1,6 @@
 def wer(r, h):
     """
     Calculation of WER with Levenshtein distance.
-
-    Works only for iterables up to 254 elements (uint8).
     O(nm) time ans space complexity.
 
     Parameters
@@ -26,7 +24,7 @@ def wer(r, h):
     # initialisation
     import numpy
 
-    d = numpy.zeros((len(r) + 1) * (len(h) + 1), dtype=numpy.uint8)
+    d = numpy.zeros((len(r) + 1) * (len(h) + 1), dtype=numpy.int32)
     d = d.reshape((len(r) + 1, len(h) + 1))
     for i in range(len(r) + 1):
         for j in range(len(h) + 1):
@@ -35,7 +33,7 @@ def wer(r, h):
             elif j == 0:
                 d[i][0] = i
 
-    backtrack = numpy.zeros((len(r)+1, len(h)+1), dtype=numpy.uint8)
+    backtrack = numpy.zeros((len(r)+1, len(h)+1), dtype=numpy.int32)
     for i in range(len(r) + 1):
         for j in range(len(h) + 1):
             if i == 0:
